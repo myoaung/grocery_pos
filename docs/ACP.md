@@ -724,4 +724,88 @@ Then:
 
 ---
 
+## 23. Phase 8 Actionable Intelligence Acceptance (FR-P8-1101..FR-P8-1120)
+
+Traceability alignment:
+- Phase 8 acceptance criteria map to `FR-P8-1101..FR-P8-1120` and corresponding `TC-FR-1101..TC-FR-1120` evidence rows.
+
+### AC-P8-01
+Given: predictive action feature flag is enabled  
+When: manager/owner queries predictive action endpoint  
+Then:
+- paginated action list is returned
+- action rows include severity, dataset, status, recommendation, and source reference
+- tenant/branch isolation is preserved
+
+### AC-P8-02
+Given: predictive action exists  
+When: authorized user executes `ACKNOWLEDGE`/`EXECUTE`/`DISMISS`  
+Then:
+- status transition is explicit and persisted
+- corresponding audit and structured metric records are created
+- unauthorized write roles are denied
+
+### AC-P8-03
+Given: ops enhancement feature flag is enabled  
+When: observability insights endpoint is queried  
+Then:
+- severity/status filters are applied deterministically
+- response includes summary counters, action rows, and severity legend
+- offline fallback state is explicit when queue backlog is present
+
+### AC-P8-04
+Given: scale guard and ops enhancement flags are enabled  
+When: scale advisory endpoint is queried  
+Then:
+- response includes throughput class, latency summary, cache hit-rate, and advisory hints
+- output remains tenant/branch scoped
+
+### AC-P8-05
+Given: integration control and webhook outbound flags are enabled  
+When: webhook dispatch and verification flows run  
+Then:
+- outbound-only contract is explicit in dispatch result
+- duplicate idempotency key does not duplicate deliveries
+- signature verification endpoint returns validity and algorithm metadata
+
+### AC-P8-06
+Given: webhook failure is simulated  
+When: dispatch is attempted  
+Then:
+- response preserves explicit retry/failed status
+- no silent success is reported
+
+### AC-P8-07
+Given: compliance export is requested  
+When: JSON/CSV export is generated  
+Then:
+- rows include `legal_hold_active`, `retention_days`, `retention_expires_at`, and `immutable_record`
+- pagination metadata is returned for collection responses
+- export remains read-only
+
+### AC-P8-08
+Given: legal-hold and retention views are queried  
+When: compliance governance endpoints return  
+Then:
+- append-only contract signal is present
+- active legal-hold scope/count is explicit
+- tenant retention values are visible
+
+### AC-P8-09
+Given: Phase 8 feature flags are disabled (default state)  
+When: phase8-protected routes are called  
+Then:
+- fail-closed response is explicit (`FEATURE_FLAG_DISABLED`)
+- no fallback mutation behavior occurs
+
+### AC-P8-10
+Given: Phase 8 release candidate is validated  
+When: build, unit/integration, e2e, performance, security, chaos, and `ci:gate` run  
+Then:
+- all Phase 8 mapped tests pass
+- no regression is introduced for Phases 1-7
+- Phase 8 can be marked `PASS` and `LOCKED`
+
+---
+
 END OF DOCUMENT

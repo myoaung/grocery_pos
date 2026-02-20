@@ -13,14 +13,24 @@ const headers = {
 
 async function run() {
   try {
-    execSync("npx vitest run test/phase7.modules.test.ts test/phase7.performance.test.ts test/phase7.chaos.test.ts", {
+    execSync(
+      "npx vitest run test/phase7.modules.test.ts test/phase7.performance.test.ts test/phase7.chaos.test.ts test/phase8.modules.test.ts test/phase8.performance.test.ts test/phase8.chaos.test.ts test/phase8.security.test.ts",
+      {
       stdio: "pipe",
-    });
+      },
+    );
   } catch {
-    throw new Error("CI gate failed: Phase 7 mandatory test suites did not pass");
+    throw new Error("CI gate failed: Phase 7/8 mandatory test suites did not pass");
   }
 
   const app = createApp(createStore());
+
+  const phase8FlagGate = await request(app)
+    .get("/api/v1/tenants/tenant-a/predictive/actions")
+    .set(headers);
+  if (phase8FlagGate.status !== 409) {
+    throw new Error(`CI gate failed: phase8 predictive flag gate expected 409, got ${phase8FlagGate.status}`);
+  }
 
   const startedAt = Date.now();
   const report = await request(app)
@@ -51,7 +61,7 @@ async function run() {
   }
 
   process.stdout.write(
-    `CI gate passed. reportLatencyMs=${effectiveLatency}; hardLimitMs=${PERFORMANCE_BUDGET.reporting.multiStore.hardLimitMs}; auditChainValid=true; severityDowngradeCount=0\n`,
+    `CI gate passed. reportLatencyMs=${effectiveLatency}; hardLimitMs=${PERFORMANCE_BUDGET.reporting.multiStore.hardLimitMs}; auditChainValid=true; severityDowngradeCount=0; phase8FlagGate=409\n`,
   );
 }
 

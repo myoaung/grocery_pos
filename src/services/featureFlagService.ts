@@ -40,6 +40,8 @@ export class FeatureFlagService {
         phase7_integration_control: this.store.getFeatureFlag(tenantId, "phase7_integration_control"),
         phase7_compliance_exports: this.store.getFeatureFlag(tenantId, "phase7_compliance_exports"),
         phase7_scale_guard: this.store.getFeatureFlag(tenantId, "phase7_scale_guard"),
+        phase8_predictive_actions: this.store.getFeatureFlag(tenantId, "phase8_predictive_actions"),
+        phase8_ops_enhancements: this.store.getFeatureFlag(tenantId, "phase8_ops_enhancements"),
       },
     };
   }

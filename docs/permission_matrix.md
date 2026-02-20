@@ -1,7 +1,7 @@
 # Cosmic Forge Grocery POS
-## API Permission Matrix v1.9
+## API Permission Matrix v1.10
 
-Version: v1.9  
+Version: v1.10  
 Status: Draft for Review  
 Date: 2026-02-20  
 Owner: Application Owner  
@@ -367,6 +367,26 @@ Phase 7 policy notes:
 2. Phase 7 feature flags are default OFF and tenant-scoped.
 3. integration token plaintext is never persisted; hash-only storage is mandatory.
 4. cross-tenant access is denied for observability, predictive, integration, and compliance paths.
+
+### 14.10 Phase 8 Actionable Intelligence Modules (FR-P8-1101..FR-P8-1120)
+
+Traceability map:
+- Endpoint and role contracts in this section correspond to `FR-P8-1101..FR-P8-1120`.
+
+| Method | Endpoint | AO | TO | MG | CA | IS | Scope / Notes |
+|---|---|---|---|---|---|---|---|
+| GET | `/api/v1/tenants/{tenantId}/predictive/actions` | ALLOW | ALLOW_SCOPE | ALLOW_SCOPE | DENY | ALLOW_SCOPE | Feature flags: `phase8_predictive_actions` + `phase7_predictive` |
+| POST | `/api/v1/tenants/{tenantId}/predictive/actions/{actionId}/act` | ALLOW | ALLOW_SCOPE | ALLOW_SCOPE | DENY | DENY | Manager/owner write control only |
+| GET | `/api/v1/tenants/{tenantId}/observability/insights` | ALLOW | ALLOW_SCOPE | ALLOW_SCOPE | DENY | ALLOW_SCOPE | Feature flags: `phase8_ops_enhancements` + `phase7_observability` |
+| GET | `/api/v1/tenants/{tenantId}/scale-guard/advisory` | ALLOW | ALLOW_SCOPE | ALLOW_SCOPE | DENY | DENY | Feature flags: `phase8_ops_enhancements` + `phase7_scale_guard` |
+| GET | `/api/v1/tenants/{tenantId}/webhooks/control/health` | ALLOW | ALLOW_SCOPE | ALLOW_SCOPE | DENY | DENY | Integration control-plane health summary (read-only) |
+| GET | `/api/v1/tenants/{tenantId}/compliance/exports/retention` | ALLOW | ALLOW_SCOPE | ALLOW_SCOPE | DENY | DENY | Read-only retention/legal-hold visibility |
+
+Phase 8 policy notes:
+1. Phase 8 feature flags are default OFF and fail closed.
+2. Predictive action write controls are restricted to `AO`/`TO`/`MG`.
+3. All new Phase 8 endpoints enforce tenant path match and branch scope constraints.
+4. Cross-tenant access attempts must return `403` with audit evidence.
 
 ---
 

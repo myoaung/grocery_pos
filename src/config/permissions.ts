@@ -65,6 +65,8 @@ export type PermissionAction =
   | "analytics.export"
   | "predictive.read"
   | "predictive.export"
+  | "predictive.action.read"
+  | "predictive.action.write"
   | "ops.dashboard.read"
   | "integration.client.read"
   | "integration.client.write"
@@ -149,6 +151,8 @@ const permissions: Record<PermissionAction, Role[]> = {
   "analytics.export": ["APPLICATION_OWNER", "TENANT_OWNER", "MANAGER"],
   "predictive.read": ["APPLICATION_OWNER", "TENANT_OWNER", "MANAGER", "INVENTORY_STAFF"],
   "predictive.export": ["APPLICATION_OWNER", "TENANT_OWNER", "MANAGER"],
+  "predictive.action.read": ["APPLICATION_OWNER", "TENANT_OWNER", "MANAGER", "INVENTORY_STAFF"],
+  "predictive.action.write": ["APPLICATION_OWNER", "TENANT_OWNER", "MANAGER"],
   "ops.dashboard.read": ["APPLICATION_OWNER", "TENANT_OWNER", "MANAGER", "INVENTORY_STAFF"],
   "integration.client.read": ["APPLICATION_OWNER", "TENANT_OWNER", "MANAGER"],
   "integration.client.write": ["APPLICATION_OWNER", "TENANT_OWNER", "MANAGER"],

@@ -62,6 +62,23 @@ export class ComplianceService {
     );
   }
 
+  private retentionDays(tenantId: string, category: "AUDIT" | "SECURITY" | "COMPLIANCE"): number {
+    const policy = this.store.getRetentionPolicy(tenantId);
+    if (category === "AUDIT") {
+      return policy.auditDays;
+    }
+    if (category === "SECURITY") {
+      return policy.securityEventDays;
+    }
+    return policy.complianceEventDays;
+  }
+
+  private expiresAt(createdAt: string, days: number): string {
+    const createdMs = Date.parse(createdAt);
+    const expiresMs = createdMs + days * 24 * 60 * 60 * 1000;
+    return new Date(expiresMs).toISOString();
+  }
+
   exportRows(ctx: RequestContext, tenantId: string, input: ComplianceExportInput) {
     this.assertTenantScope(ctx, tenantId);
     this.assertEnabled(tenantId);
@@ -92,6 +109,9 @@ export class ComplianceService {
               actor_user_id: item.actorUserId,
               created_at: item.createdAt,
               legal_hold_active: this.legalHoldActive(item.tenantId, item.branchId),
+              retention_days: this.retentionDays(item.tenantId, "AUDIT"),
+              retention_expires_at: this.expiresAt(item.createdAt, this.retentionDays(item.tenantId, "AUDIT")),
+              immutable_record: true,
             });
           }
         }
@@ -113,6 +133,9 @@ export class ComplianceService {
               actor_user_id: item.actorUserId,
               created_at: item.createdAt,
               legal_hold_active: this.legalHoldActive(item.tenantId, item.branchId),
+              retention_days: this.retentionDays(item.tenantId, "SECURITY"),
+              retention_expires_at: this.expiresAt(item.createdAt, this.retentionDays(item.tenantId, "SECURITY")),
+              immutable_record: true,
             });
           }
         }
@@ -134,6 +157,9 @@ export class ComplianceService {
               actor_user_id: item.actorUserId,
               created_at: item.createdAt,
               legal_hold_active: this.legalHoldActive(item.tenantId, item.branchId),
+              retention_days: this.retentionDays(item.tenantId, "COMPLIANCE"),
+              retention_expires_at: this.expiresAt(item.createdAt, this.retentionDays(item.tenantId, "COMPLIANCE")),
+              immutable_record: true,
             });
           }
         }
@@ -148,6 +174,23 @@ export class ComplianceService {
       readSource: read.readSource,
       cacheHit: read.cacheHit,
       rows: read.value,
+    };
+  }
+
+  retentionView(ctx: RequestContext, tenantId: string) {
+    this.assertTenantScope(ctx, tenantId);
+    this.assertEnabled(tenantId);
+    const policy = this.store.getRetentionPolicy(tenantId);
+    const activeHolds = this.store.legalHolds.filter((item) => item.tenantId === tenantId && item.active);
+    return {
+      tenantId,
+      generatedAt: this.store.nowIso(),
+      appendOnlyContract: true,
+      retention: policy,
+      legalHold: {
+        activeCount: activeHolds.length,
+        activeScopes: [...new Set(activeHolds.map((item) => item.scope))],
+      },
     };
   }
 

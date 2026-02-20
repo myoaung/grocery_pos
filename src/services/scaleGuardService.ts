@@ -166,4 +166,64 @@ export class ScaleGuardService {
       expiredEntries: scoped.filter((item) => item.expiresAt < now).length,
     };
   }
+
+  advisory(
+    tenantId: string,
+    branchId: string,
+    mode: "phase8" | "phase7" = "phase8",
+  ): {
+    tenantId: string;
+    branchId: string;
+    throughputClass: "LOW" | "MEDIUM" | "HIGH";
+    avgReadLatencyMs: number;
+    readSamples: number;
+    cache: {
+      entries: number;
+      totalHits: number;
+      expiredEntries: number;
+      hitRatePct: number;
+    };
+    hints: string[];
+    mode: "phase8" | "phase7";
+  } {
+    const stats = this.cacheStats(tenantId, branchId);
+    const metrics = this.store.structuredMetrics
+      .filter((item) => item.tenantId === tenantId && item.branchId === branchId)
+      .filter((item) => item.metricName === "scale_read_latency_ms");
+    const readSamples = metrics.length;
+    const avgReadLatencyMs =
+      readSamples === 0 ? 0 : Math.round((metrics.reduce((acc, item) => acc + item.metricValue, 0) / readSamples) * 100) / 100;
+    const requestsLastHour = metrics.filter((item) => Date.parse(item.createdAt) >= Date.now() - 60 * 60 * 1000).length;
+    const throughputClass =
+      requestsLastHour >= 120 ? "HIGH" : requestsLastHour >= 40 ? "MEDIUM" : "LOW";
+    const hitRatePct = stats.entries === 0 ? 0 : Math.round((stats.totalHits / Math.max(1, stats.totalHits + stats.entries)) * 10000) / 100;
+    const hints: string[] = [];
+
+    if (throughputClass === "HIGH" && hitRatePct < 30) {
+      hints.push("Increase cache TTL or pre-warm high-volume predictive datasets.");
+    }
+    if (avgReadLatencyMs > 800) {
+      hints.push("Latency is elevated; prefer replica reads and reduce payload size.");
+    }
+    if (stats.expiredEntries > stats.entries * 0.5 && stats.entries > 0) {
+      hints.push("High expiry churn detected; align cache keys with stable query windows.");
+    }
+    if (hints.length === 0) {
+      hints.push("Current throughput and cache behavior are within advisory thresholds.");
+    }
+
+    return {
+      tenantId,
+      branchId,
+      throughputClass,
+      avgReadLatencyMs,
+      readSamples,
+      cache: {
+        ...stats,
+        hitRatePct,
+      },
+      hints,
+      mode,
+    };
+  }
 }

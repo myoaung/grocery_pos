@@ -32,6 +32,7 @@ interface WebhookCircuitState {
 }
 
 export class WebhookService {
+  private readonly signatureAlgorithm = "HMAC-SHA256";
   private readonly rateWindows = new Map<string, WebhookRateWindowState>();
   private readonly circuitStates = new Map<string, WebhookCircuitState>();
   private readonly rateLimitPerMinute = Math.max(1, Number(process.env.WEBHOOK_RATE_LIMIT_PER_MINUTE ?? 5));
@@ -471,6 +472,7 @@ export class WebhookService {
     return {
       eventType: input.eventType,
       idempotencyKey: input.idempotencyKey,
+      outboundOnly: true,
       deliveries,
     };
   }
@@ -534,6 +536,7 @@ export class WebhookService {
       deliveryId: delivery.deliveryId,
       endpointId: delivery.endpointId,
       signatureValid,
+      signatureAlgorithm: this.signatureAlgorithm,
     };
   }
 }

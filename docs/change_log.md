@@ -2,6 +2,80 @@
 
 ---
 
+## v1.15 (Phase 8 Actionable Intelligence - PASS / LOCKED)
+Date: 2026-02-20  
+Author: Application Owner
+
+Reason:
+- Execute Phase 8 additive implementation and governance closure for actionable intelligence.
+- Preserve Phase 1-7 runtime behavior with no transactional or pricing-policy drift.
+
+Changes:
+- Added Phase 8 predictive action module:
+  - `src/modules/analytics/predictiveActionsService.ts`
+  - `src/modules/analytics/predictiveActionsRoutes.ts`
+- Extended observability and scale guard endpoints for ops enhancements:
+  - `src/modules/observability/metricsService.ts`
+  - `src/modules/observability/metricsRoutes.ts`
+  - `src/services/scaleGuardService.ts`
+- Extended webhook/control and compliance contracts:
+  - `src/modules/webhooks/integrationControlService.ts`
+  - `src/modules/webhooks/webhookService.ts`
+  - `src/modules/webhooks/webhookRoutes.ts`
+  - `src/modules/compliance/complianceService.ts`
+  - `src/modules/compliance/complianceRoutes.ts`
+- Expanded shared contracts, flags, and routing:
+  - `src/types.ts`
+  - `src/config/coreContracts.ts`
+  - `src/store/memoryStore.ts`
+  - `src/services/featureFlagService.ts`
+  - `src/config/permissions.ts`
+  - `src/routes/api.ts`
+- Updated Phase 8 ops UI:
+  - `web/ops-dashboard.html`
+  - `web/ops-dashboard.js`
+  - `web/ops-dashboard.css`
+- Added Phase 8 automated coverage:
+  - `test/phase8.modules.test.ts`
+  - `test/phase8.performance.test.ts`
+  - `test/phase8.security.test.ts`
+  - `test/phase8.chaos.test.ts`
+  - `e2e/phase8.extensions.spec.ts`
+- CI/governance automation updates:
+  - `package.json` (`test:performance`, `test:security`, `test:chaos` include phase8 suites)
+  - `scripts/ci-gate.ts` (Phase 7/8 mandatory suites + Phase 8 fail-closed gate check)
+  - `scripts/full-sync-phase1-8.sh` (full validation + optional `SKIP_PUSH=1`)
+- Governance documentation updates (append-only):
+  - `docs/FRD-v1.2.md` (FR-P8-1101..FR-P8-1120)
+  - `docs/ACP.md` (Phase 8 acceptance criteria)
+  - `docs/report_catalog.md` (Phase 8 actionable datasets)
+  - `docs/permission_matrix.md` (Phase 8 endpoint RBAC)
+  - `docs/release_governance.md` (Phase 8 go/no-go and lock gate)
+  - `docs/phase_summary.md` (Phase 8 PASS / LOCKED)
+  - `docs/TC_traceability_matrix.md` (Phase 8 PASS evidence rows)
+  - `docs/phase8_dependency_graph.mmd` (module/FR relationship map)
+
+Impact:
+- Predictive datasets now support controlled actionable workflows behind default-OFF tenant feature flags.
+- Ops dashboard now exposes severity-filtered actionable insights, advisory hints, and explicit offline fallback cues.
+- Compliance exports now include retention and legal-hold governance metadata with append-only indicators.
+- Webhook control-plane health and signature evidence are explicit while preserving outbound-only behavior.
+
+Verification:
+- `npm run build` passed.
+- `npm test` passed.
+- `npm run test:e2e` passed.
+- `npm run test:performance` passed.
+- `npm run test:security` passed.
+- `npm run test:chaos` passed.
+- `npm run ci:gate` passed.
+- `SKIP_PUSH=1 bash scripts/full-sync-phase1-8.sh` passed.
+
+Approval:
+- Status: Draft for owner review and sign-off.
+
+---
+
 ## v1.14 (Phase 7 Operational Intelligence - Locked)
 Date: 2026-02-20  
 Author: Application Owner

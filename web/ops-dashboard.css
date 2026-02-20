@@ -173,6 +173,12 @@ select {
   color: var(--critical);
 }
 
+.banner.offline {
+  border-color: #60a5fa;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
 .hidden {
   display: none;
 }
@@ -199,6 +205,17 @@ select {
 .pill.critical {
   color: #991b1b;
   background: #fee2e2;
+}
+
+.list .actions {
+  margin-top: 6px;
+  display: flex;
+  gap: 6px;
+}
+
+.list .actions .btn {
+  padding: 5px 8px;
+  font-size: 0.75rem;
 }
 
 @media (max-width: 960px) {

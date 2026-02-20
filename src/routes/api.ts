@@ -4,6 +4,7 @@ import { canAccessTenantReport } from "../config/permissions";
 import type { PermissionAction } from "../config/permissions";
 import { PERFORMANCE_BUDGET } from "../config/performanceBudget";
 import { createAnalyticsRouter } from "../modules/analytics/analyticsRoutes";
+import { createPredictiveActionsRouter } from "../modules/analytics/predictiveActionsRoutes";
 import { createPredictiveRouter } from "../modules/analytics/predictiveRoutes";
 import { createAdvancedReportRouter } from "../modules/advanced-reporting/advancedReportRoutes";
 import { createComplianceRouter } from "../modules/compliance/complianceRoutes";
@@ -139,6 +140,7 @@ export function createApiRouter(store: MemoryStore) {
   router.use(createDashboardRouter(store));
   router.use(createAdvancedReportRouter(store));
   router.use(createAnalyticsRouter(store));
+  router.use(createPredictiveActionsRouter(store));
   router.use(createPredictiveRouter(store));
   router.use(createDiscountsRouter(store));
   router.use(createComplianceRouter(store));

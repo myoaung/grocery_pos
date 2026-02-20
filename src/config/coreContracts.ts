@@ -25,6 +25,8 @@ export const CORE_FEATURE_FLAGS = Object.freeze([
   "phase7_integration_control",
   "phase7_compliance_exports",
   "phase7_scale_guard",
+  "phase8_predictive_actions",
+  "phase8_ops_enhancements",
 ] as const satisfies readonly FeatureFlagKey[]);
 
 export const SYSTEM_JOB_ACTOR = Object.freeze({

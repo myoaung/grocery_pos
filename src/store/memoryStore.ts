@@ -41,6 +41,7 @@ import type {
   WebhookDelivery,
   IntegrationClient,
   LegalHold,
+  PredictiveActionRecord,
 } from "../types";
 import { inventoryKey } from "../utils/keys";
 
@@ -77,6 +78,7 @@ export class MemoryStore {
   readonly webhookDeliveryIdempotency = new Set<string>();
   readonly integrationClients: IntegrationClient[] = [];
   readonly legalHolds: LegalHold[] = [];
+  readonly predictiveActions: PredictiveActionRecord[] = [];
   readonly scaleCacheRecords = new Map<
     string,
     {
@@ -806,6 +808,8 @@ export class MemoryStore {
       phase7_integration_control: false,
       phase7_compliance_exports: false,
       phase7_scale_guard: false,
+      phase8_predictive_actions: false,
+      phase8_ops_enhancements: false,
     };
   }
 
@@ -826,6 +830,36 @@ export class MemoryStore {
     existing[key] = enabled;
     this.featureFlags.set(tenantId, { ...existing });
     return { ...existing };
+  }
+
+  upsertPredictiveAction(
+    input: Omit<PredictiveActionRecord, "actionId" | "createdAt" | "updatedAt"> & { actionId?: string },
+  ): PredictiveActionRecord {
+    const now = this.nowIso();
+    if (input.actionId) {
+      const existingIndex = this.predictiveActions.findIndex((item) => item.actionId === input.actionId);
+      if (existingIndex >= 0) {
+        const existing = this.predictiveActions[existingIndex];
+        const updated: PredictiveActionRecord = {
+          ...existing,
+          ...input,
+          actionId: existing.actionId,
+          createdAt: existing.createdAt,
+          updatedAt: now,
+        };
+        this.predictiveActions[existingIndex] = updated;
+        return updated;
+      }
+    }
+    const { actionId, ...rest } = input;
+    const created: PredictiveActionRecord = {
+      actionId: actionId ?? randomUUID(),
+      createdAt: now,
+      updatedAt: now,
+      ...rest,
+    };
+    this.predictiveActions.push(created);
+    return created;
   }
 
   getRetentionPolicy(tenantId: string): RetentionPolicy {

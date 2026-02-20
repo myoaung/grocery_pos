@@ -9,7 +9,7 @@
   <body>
     <header class="top">
       <div>
-        <p class="eyebrow">Phase 7 Operational Intelligence</p>
+        <p class="eyebrow">Phase 8 Operational Intelligence</p>
         <h1>Operations Dashboard</h1>
       </div>
       <div class="actions">
@@ -19,6 +19,7 @@
     </header>
 
     <section id="banner" class="banner hidden"></section>
+    <section id="offlineNotice" class="banner hidden"></section>
 
     <section class="panel">
       <h2>Observability Health</h2>
@@ -95,6 +96,39 @@
         </form>
         <button id="complianceExportBtn" class="btn ghost" type="button">Export Compliance CSV</button>
         <ul id="legalHoldList" class="list"></ul>
+      </article>
+    </section>
+
+    <section class="panel split">
+      <article>
+        <h2>Predictive Actions</h2>
+        <form id="actionFilterForm" class="inline">
+          <label>
+            Severity
+            <select id="actionSeverityInput">
+              <option value="">ALL</option>
+              <option value="CRITICAL">CRITICAL</option>
+              <option value="WARN">WARN</option>
+              <option value="INFO">INFO</option>
+            </select>
+          </label>
+          <label>
+            Status
+            <select id="actionStatusInput">
+              <option value="">ALL</option>
+              <option value="OPEN">OPEN</option>
+              <option value="ACKNOWLEDGED">ACKNOWLEDGED</option>
+              <option value="EXECUTED">EXECUTED</option>
+              <option value="DISMISSED">DISMISSED</option>
+            </select>
+          </label>
+          <button class="btn" type="submit">Apply</button>
+        </form>
+        <ul id="actionList" class="list"></ul>
+      </article>
+      <article>
+        <h2>Scale Advisory</h2>
+        <pre id="scaleAdvisoryOutput" class="code"></pre>
       </article>
     </section>
 

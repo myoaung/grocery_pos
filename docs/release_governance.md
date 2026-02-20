@@ -1,7 +1,7 @@
 # Cosmic Forge Grocery POS
-## Release Governance v1.1
+## Release Governance v1.2
 
-Version: v1.1  
+Version: v1.2  
 Status: Draft for Review  
 Date: 2026-02-20  
 Owner: Application Owner  
@@ -179,6 +179,42 @@ Phase 7 go/no-go:
 
 Phase lock rule:
 1. Phase 7 is marked `LOCKED` before any Phase 8 planning or implementation merge.
+
+---
+
+## 11. Phase 8 Actionable Intelligence Gate (FR-P8-1101..FR-P8-1120)
+
+Mandatory gate checks:
+1. `npm run build` passes.
+2. `npm test` passes with no regressions in Phases 1-7.
+3. `npm run test:e2e` passes including Phase 8 E2E suite.
+4. `npm run test:performance` passes including `test/phase8.performance.test.ts`.
+5. `npm run test:security` passes including `test/phase8.security.test.ts`.
+6. `npm run test:chaos` passes including `test/phase8.chaos.test.ts`.
+7. `npm run ci:gate` passes with mandatory Phase 7/8 suites:
+   - `test/phase7.modules.test.ts`
+   - `test/phase7.performance.test.ts`
+   - `test/phase7.chaos.test.ts`
+   - `test/phase8.modules.test.ts`
+   - `test/phase8.performance.test.ts`
+   - `test/phase8.security.test.ts`
+   - `test/phase8.chaos.test.ts`
+8. Phase 8 traceability rows are updated with executed evidence and no `PENDING` rows.
+9. Phase 8 FR/TC namespace alignment is complete (`FR-P8-1101..FR-P8-1120` -> `TC-FR-1101..TC-FR-1120-*`).
+
+Phase 8 go/no-go:
+1. `GO`:
+   - predictive action flows are feature-flagged and tenant-scoped.
+   - ops dashboard enhancements show explicit severity/offline states.
+   - webhook health and signature evidence are verifiable.
+   - compliance export retention/legal-hold fields are present in JSON/CSV output.
+2. `NO-GO`:
+   - any Phase 1-7 regression.
+   - any cross-tenant leak across phase8 routes.
+   - any audit chain integrity or immutability failure.
+
+Phase lock rule:
+1. Phase 8 is marked `LOCKED` only after all gate checks pass and traceability is fully PASS.
 
 ---
 

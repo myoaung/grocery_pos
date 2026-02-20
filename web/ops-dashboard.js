@@ -3,6 +3,7 @@ const tenantId = url.searchParams.get("tenantId") || "tenant-a";
 const branchId = url.searchParams.get("branchId") || "branch-a-1";
 const role = url.searchParams.get("role") || "MANAGER";
 const userId = url.searchParams.get("userId") || "u-mg-a";
+const locale = (url.searchParams.get("locale") || "en").toLowerCase();
 
 const headers = {
   "x-user-id": userId,
@@ -10,6 +11,25 @@ const headers = {
   "x-tenant-id": tenantId,
   "x-branch-id": branchId,
 };
+
+const MESSAGES = {
+  en: {
+    offline: "Offline mode: showing latest cached output. Some actions are disabled.",
+    refreshed: "Operational intelligence refreshed.",
+    predictiveUpdated: "Predictive panel updated.",
+    actionUpdated: "Predictive action updated.",
+  },
+  mm: {
+    offline: "အော့ဖ်လိုင်းမုဒ် - နောက်ဆုံး cached output ကိုပြထားသည်။ အချို့လုပ်ဆောင်ချက်များပိတ်ထားသည်။",
+    refreshed: "Operational intelligence ကိုအသစ်ပြန်တင်ပြီးပါပြီ။",
+    predictiveUpdated: "Predictive panel ကိုအသစ်ပြန်တင်ပြီးပါပြီ။",
+    actionUpdated: "Predictive action ကို update လုပ်ပြီးပါပြီ။",
+  },
+};
+
+function t(key) {
+  return MESSAGES[locale]?.[key] || MESSAGES.en[key] || key;
+}
 
 function setText(id, value) {
   const el = document.getElementById(id);
@@ -28,6 +48,22 @@ function showBanner(message, isError = false) {
   }
   el.textContent = message;
   el.className = isError ? "banner error" : "banner";
+}
+
+function showOfflineNotice(message) {
+  const el = document.getElementById("offlineNotice");
+  if (!el) return;
+  if (!message) {
+    el.textContent = "";
+    el.className = "banner hidden";
+    return;
+  }
+  el.textContent = message;
+  el.className = "banner offline";
+}
+
+function updateOfflineNotice() {
+  showOfflineNotice(navigator.onLine ? "" : t("offline"));
 }
 
 async function api(path, options = {}) {
@@ -119,6 +155,12 @@ function currentTrendInputs() {
   };
 }
 
+function currentActionFilters() {
+  const severity = document.getElementById("actionSeverityInput")?.value || "";
+  const status = document.getElementById("actionStatusInput")?.value || "";
+  return { severity, status };
+}
+
 async function loadPredictiveSla() {
   const horizonDays = currentSlaHorizon();
   const result = await api(`/api/v1/tenants/${tenantId}/predictive/sla?horizonDays=${horizonDays}`);
@@ -139,20 +181,38 @@ async function loadPredictiveTrend() {
   }
 }
 
-function exportPredictiveSlaCsv() {
+async function loadPredictiveActions() {
+  const trend = currentTrendInputs();
   const horizonDays = currentSlaHorizon();
-  window.open(
-    `/api/v1/tenants/${tenantId}/predictive/export?dataset=sla&format=csv&horizonDays=${horizonDays}`,
-    "_blank",
+  const filters = currentActionFilters();
+  const params = new URLSearchParams({
+    horizonDays: String(horizonDays),
+    metric: trend.metric,
+    historyDays: String(trend.historyDays),
+    forecastDays: String(trend.forecastDays),
+    page: "1",
+    pageSize: "12",
+    refresh: "true",
+  });
+  if (filters.severity) params.set("severity", filters.severity);
+  if (filters.status) params.set("status", filters.status);
+
+  const result = await api(`/api/v1/tenants/${tenantId}/predictive/actions?${params.toString()}`);
+  renderList(
+    "actionList",
+    result.item.items || [],
+    (item) =>
+      `<span class="pill ${severityClass(item.severity)}">${item.severity}</span><strong>${item.title}</strong><br><small>${item.description}</small><br><small>Status=${item.status} | ${item.dataset}/${item.metric}</small><div class="actions"><button class="btn ghost" data-action-id="${item.actionId}" data-decision="ACKNOWLEDGE">Acknowledge</button><button class="btn ghost" data-action-id="${item.actionId}" data-decision="EXECUTE">Execute</button><button class="btn ghost" data-action-id="${item.actionId}" data-decision="DISMISS">Dismiss</button></div>`,
   );
+  bindActionButtons();
 }
 
-function exportPredictiveTrendCsv() {
-  const input = currentTrendInputs();
-  window.open(
-    `/api/v1/tenants/${tenantId}/predictive/export?dataset=trend&format=csv&metric=${encodeURIComponent(input.metric)}&historyDays=${input.historyDays}&forecastDays=${input.forecastDays}`,
-    "_blank",
-  );
+async function loadScaleAdvisory() {
+  const advisory = await api(`/api/v1/tenants/${tenantId}/scale-guard/advisory`);
+  const out = document.getElementById("scaleAdvisoryOutput");
+  if (out) {
+    out.textContent = JSON.stringify(advisory.item, null, 2);
+  }
 }
 
 async function loadClients() {
@@ -188,6 +248,46 @@ async function loadLegalHolds() {
   );
 }
 
+async function actOnPredictiveAction(actionId, decision) {
+  await api(`/api/v1/tenants/${tenantId}/predictive/actions/${actionId}/act`, {
+    method: "POST",
+    body: JSON.stringify({ decision }),
+  });
+  await loadPredictiveActions();
+  showBanner(t("actionUpdated"));
+}
+
+function bindActionButtons() {
+  document.querySelectorAll("[data-action-id]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const actionId = button.getAttribute("data-action-id");
+      const decision = button.getAttribute("data-decision");
+      if (!actionId || !decision) return;
+      try {
+        await actOnPredictiveAction(actionId, decision);
+      } catch (error) {
+        showBanner(error.message || "Failed to update predictive action.", true);
+      }
+    });
+  });
+}
+
+function exportPredictiveSlaCsv() {
+  const horizonDays = currentSlaHorizon();
+  window.open(
+    `/api/v1/tenants/${tenantId}/predictive/export?dataset=sla&format=csv&horizonDays=${horizonDays}`,
+    "_blank",
+  );
+}
+
+function exportPredictiveTrendCsv() {
+  const input = currentTrendInputs();
+  window.open(
+    `/api/v1/tenants/${tenantId}/predictive/export?dataset=trend&format=csv&metric=${encodeURIComponent(input.metric)}&historyDays=${input.historyDays}&forecastDays=${input.forecastDays}`,
+    "_blank",
+  );
+}
+
 function exportComplianceCsv() {
   window.open(`/api/v1/tenants/${tenantId}/compliance/exports?format=csv&page=1&pageSize=200`, "_blank");
 }
@@ -198,16 +298,21 @@ async function refreshAll() {
     loadJobs(),
     loadPredictiveSla(),
     loadPredictiveTrend(),
+    loadPredictiveActions(),
+    loadScaleAdvisory(),
     loadClients(),
     loadLegalHolds(),
   ]);
 }
 
 function bindEvents() {
+  window.addEventListener("online", updateOfflineNotice);
+  window.addEventListener("offline", updateOfflineNotice);
+
   document.getElementById("refreshBtn")?.addEventListener("click", async () => {
     try {
       await refreshAll();
-      showBanner("Operational intelligence refreshed.");
+      showBanner(t("refreshed"));
     } catch (error) {
       showBanner(error.message || "Refresh failed.", true);
     }
@@ -217,7 +322,8 @@ function bindEvents() {
     event.preventDefault();
     try {
       await loadPredictiveSla();
-      showBanner("SLA forecast updated.");
+      await loadPredictiveActions();
+      showBanner(t("predictiveUpdated"));
     } catch (error) {
       showBanner(error.message || "SLA prediction failed.", true);
     }
@@ -227,9 +333,20 @@ function bindEvents() {
     event.preventDefault();
     try {
       await loadPredictiveTrend();
-      showBanner("Trend forecast updated.");
+      await loadPredictiveActions();
+      showBanner(t("predictiveUpdated"));
     } catch (error) {
       showBanner(error.message || "Trend prediction failed.", true);
+    }
+  });
+
+  document.getElementById("actionFilterForm")?.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    try {
+      await loadPredictiveActions();
+      showBanner("Predictive action filters applied.");
+    } catch (error) {
+      showBanner(error.message || "Action filter request failed.", true);
     }
   });
 
@@ -272,11 +389,12 @@ function bindEvents() {
 
 async function init() {
   bindEvents();
+  updateOfflineNotice();
   try {
     await refreshAll();
   } catch (error) {
     showBanner(
-      `${error.message || "Initialization failed."} Ensure Phase 7 feature flags are enabled for this tenant.`,
+      `${error.message || "Initialization failed."} Ensure Phase 7/8 feature flags are enabled for this tenant.`,
       true,
     );
   }

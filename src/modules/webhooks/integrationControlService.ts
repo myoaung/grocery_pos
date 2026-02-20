@@ -199,4 +199,27 @@ export class IntegrationControlService {
       valid,
     };
   }
+
+  health(ctx: RequestContext, tenantId: string) {
+    this.assertTenantScope(ctx, tenantId);
+    this.assertEnabled(tenantId);
+    const clients = this.store.integrationClients.filter((item) => item.tenantId === tenantId);
+    const deliveries = this.store.webhookDeliveries.filter((item) => item.tenantId === tenantId);
+    return {
+      tenantId,
+      generatedAt: this.store.nowIso(),
+      clients: {
+        total: clients.length,
+        enabled: clients.filter((item) => item.enabled).length,
+        killSwitchEnabled: clients.filter((item) => item.killSwitch).length,
+      },
+      deliveries: {
+        total: deliveries.length,
+        delivered: deliveries.filter((item) => item.status === "DELIVERED").length,
+        retrying: deliveries.filter((item) => item.status === "RETRYING").length,
+        failed: deliveries.filter((item) => item.status === "FAILED").length,
+      },
+      outboundOnly: true,
+    };
+  }
 }

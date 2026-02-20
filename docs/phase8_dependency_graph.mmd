@@ -1,0 +1,39 @@
+flowchart LR
+    FR1101["FR-P8-1101..1104\nPredictive Actions"]
+    FR1105["FR-P8-1105..1108\nOps Dashboard Enhancements"]
+    FR1109["FR-P8-1109..1112\nWebhook/Control"]
+    FR1113["FR-P8-1113..1116\nCompliance/Retention Export"]
+    FR1117["FR-P8-1117..1118\nFeature Flags"]
+    FR1119["FR-P8-1119..1120\nSecurity + Regression Gate"]
+
+    PA["src/modules/analytics/predictiveActionsService.ts\npredictiveActionsRoutes.ts"]
+    OBS["src/modules/observability/metricsService.ts\nmetricsRoutes.ts"]
+    WEB["src/modules/webhooks/integrationControlService.ts\nwebhookService.ts\nwebhookRoutes.ts"]
+    CMP["src/modules/compliance/complianceService.ts\ncomplianceRoutes.ts"]
+    SG["src/services/scaleGuardService.ts"]
+    FF["src/services/featureFlagService.ts\nsrc/config/coreContracts.ts\nsrc/store/memoryStore.ts\nsrc/types.ts"]
+    UI["web/ops-dashboard.html/js/css"]
+    RT["src/routes/api.ts\nsrc/config/permissions.ts"]
+    TEST["test/phase8.modules.test.ts\nphase8.performance/security/chaos\ne2e/phase8.extensions.spec.ts"]
+
+    FR1101 --> PA
+    FR1105 --> OBS
+    FR1105 --> UI
+    FR1109 --> WEB
+    FR1113 --> CMP
+    FR1105 --> SG
+    FR1117 --> FF
+    FR1119 --> RT
+    FR1119 --> TEST
+
+    FF --> PA
+    FF --> OBS
+    FF --> WEB
+    FF --> CMP
+    SG --> OBS
+    RT --> PA
+    RT --> OBS
+    RT --> WEB
+    RT --> CMP
+    UI --> OBS
+    UI --> PA

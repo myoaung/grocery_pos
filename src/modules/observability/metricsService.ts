@@ -10,6 +10,13 @@ interface JobsQueryInput {
   jobType?: string;
 }
 
+interface InsightsQueryInput {
+  severity?: "INFO" | "WARN" | "CRITICAL";
+  status?: "OPEN" | "ACKNOWLEDGED" | "EXECUTED" | "DISMISSED";
+  page: number;
+  pageSize: number;
+}
+
 function round2(value: number): number {
   return Math.round(value * 100) / 100;
 }
@@ -72,6 +79,13 @@ export class MetricsService {
       return;
     }
     throw new ServiceError("FEATURE_FLAG_DISABLED", "Phase 7 scale guard is disabled for this tenant", 409);
+  }
+
+  private assertOpsEnhancementEnabled(tenantId: string): void {
+    if (this.store.getFeatureFlag(tenantId, "phase8_ops_enhancements")) {
+      return;
+    }
+    throw new ServiceError("FEATURE_FLAG_DISABLED", "Phase 8 ops enhancements are disabled for this tenant", 409);
   }
 
   private scopedMetrics(ctx: RequestContext, tenantId: string): ReadonlyArray<Readonly<StructuredMetricLog>> {
@@ -312,5 +326,54 @@ export class MetricsService {
       removed,
       prefix,
     };
+  }
+
+  insights(ctx: RequestContext, tenantId: string, input: InsightsQueryInput) {
+    this.assertTenantScope(ctx, tenantId);
+    this.assertObservabilityEnabled(tenantId);
+    this.assertOpsEnhancementEnabled(tenantId);
+
+    const alerts = this.alerts(ctx, tenantId).items;
+    const scopedActions = this.store.predictiveActions
+      .filter((item) => item.tenantId === tenantId)
+      .filter((item) => (ctx.role === "APPLICATION_OWNER" ? true : item.branchId === ctx.branchId))
+      .filter((item) => (input.severity ? item.severity === input.severity : true))
+      .filter((item) => (input.status ? item.status === input.status : true))
+      .sort((a, b) => (a.updatedAt < b.updatedAt ? 1 : -1));
+    const paged = paginate(scopedActions, input.page, input.pageSize);
+    const pendingQueue = this.store.queue.filter(
+      (item) =>
+        item.tenantId === tenantId &&
+        (ctx.role === "APPLICATION_OWNER" ? true : item.branchId === ctx.branchId) &&
+        item.state === "PENDING",
+    ).length;
+
+    return {
+      tenantId,
+      branchId: ctx.branchId,
+      generatedAt: this.store.nowIso(),
+      severityLegend: {
+        INFO: "#1e3a8a",
+        WARN: "#92400e",
+        CRITICAL: "#991b1b",
+      },
+      summary: {
+        alertCount: alerts.length,
+        actionCount: scopedActions.length,
+        criticalActions: scopedActions.filter((item) => item.severity === "CRITICAL" && item.status === "OPEN").length,
+        pendingQueue,
+        offlineFallback: pendingQueue > 0,
+      },
+      alerts,
+      actions: paged.rows,
+      pagination: paged.pagination,
+    };
+  }
+
+  scaleAdvisory(ctx: RequestContext, tenantId: string) {
+    this.assertTenantScope(ctx, tenantId);
+    this.assertScaleGuardEnabled(tenantId);
+    this.assertOpsEnhancementEnabled(tenantId);
+    return this.scale.advisory(tenantId, ctx.branchId, "phase8");
   }
 }

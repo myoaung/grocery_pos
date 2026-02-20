@@ -65,6 +65,15 @@ export function createWebhookRouter(store: MemoryStore) {
     }),
   );
 
+  router.get(
+    "/api/v1/tenants/:tenantId/webhooks/control/health",
+    requireTenantPathMatch(),
+    requirePermission("integration.client.read"),
+    withErrorHandling((req, res) => {
+      res.json({ item: controlService.health(req.ctx, req.params.tenantId) });
+    }),
+  );
+
   router.post(
     "/api/v1/tenants/:tenantId/webhooks/clients",
     requireTenantPathMatch(),

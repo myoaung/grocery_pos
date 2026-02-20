@@ -1,7 +1,7 @@
 # Cosmic Forge Grocery POS
-## TC Traceability Matrix v1.11 (Authoritative)
+## TC Traceability Matrix v1.12 (Authoritative)
 
-Version: v1.10  
+Version: v1.12  
 Status: Active  
 Date: 2026-02-20  
 Owner: Application Owner  
@@ -43,6 +43,10 @@ Initial baseline tags:
 - `DV-2026-0005.1`
 - `RV-2026.02.20.6.1`
 - `DV-2026-0006.1`
+- `RV-2026.02.20.7`
+- `DV-2026-0007`
+- `RV-2026.02.20.8`
+- `DV-2026-0008`
 
 Update rules:
 1. If requirement interpretation changes, bump `RV-*`.
@@ -311,6 +315,31 @@ Status values:
 | TC-FR-1018-INT | FR-P7-1018 | 7 | P2 | IT | Scale guard feature flag defaults OFF and gates cache stats/eviction paths | `[INT] test/phase7.modules.test.ts` (`phase7 feature flags default off and can be enabled`) | RV-2026.02.20.7 | DV-2026-0007 | 2026-02-20 | PASS |
 | TC-FR-1019-E2E-UI | FR-P7-1019 | 7 | P1 | E2E | Ops dashboard UI renders observability cards and SLA payload with fallback messaging | `[E2E][UI] e2e/phase7.extensions.spec.ts` (`Observability dashboard shows aggregated metrics`) | RV-2026.02.20.7 | DV-2026-0007 | 2026-02-20 | PASS |
 | TC-FR-1020-SEC | FR-P7-1020 | 7 | P0 | SEC | Routing and RBAC reject unauthorized cross-tenant phase7 access (`403`) | `[INT][SEC] test/phase7.modules.test.ts` (`cross-tenant predictive/compliance/control access returns 403`) | RV-2026.02.20.7 | DV-2026-0007 | 2026-02-20 | PASS |
+
+### 3.10 Phase 8 Actionable Intelligence Traceability (FR-P8-1101..FR-P8-1120)
+
+| TC ID | Req ID | Phase | Priority | Level | Scenario | Evidence Ref | RV Tag | DV Tag | Last Updated | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| TC-FR-1101-INT | FR-P8-1101 | 8 | P0 | IT | Predictive actions endpoint returns actionable paginated records | `[INT] test/phase8.modules.test.ts` (`returns expected predictive actions and supports write decisions`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1102-INT | FR-P8-1102 | 8 | P0 | IT | Authorized users can acknowledge/execute/dismiss predictive actions | `[INT] test/phase8.modules.test.ts` (`returns expected predictive actions and supports write decisions`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1103-INT | FR-P8-1103 | 8 | P1 | IT | Predictive action derivation remains idempotent by source reference | `[INT] test/phase8.modules.test.ts` (`returns expected predictive actions and supports write decisions`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1104-INT | FR-P8-1104 | 8 | P1 | IT | Predictive action transitions emit audit and structured metric evidence | `[INT] test/phase8.modules.test.ts`, `[SEC] test/phase8.security.test.ts` (`keeps audit records immutable and append-only`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1105-INT | FR-P8-1105 | 8 | P1 | IT | Observability insights endpoint returns summary, alerts, and action rows | `[INT] test/phase8.modules.test.ts` (`renders enhanced insights and filters severity/status`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1106-E2E | FR-P8-1106 | 8 | P1 | E2E | Ops dashboard applies severity/status filters and supports actionable controls | `[E2E][UI] e2e/phase8.extensions.spec.ts` (`predictive actions are visible and actionable in ops dashboard`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1107-LOAD | FR-P8-1107 | 8 | P2 | PERF | Scale advisory stays within performance budget under repeated calls | `[LOAD] test/phase8.performance.test.ts` (`stable advisory latency`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1108-E2E-UI | FR-P8-1108 | 8 | P2 | E2E | Ops UI shows offline fallback and severity visual indicators | `[E2E][UI] e2e/phase8.extensions.spec.ts`, `[INT] test/phase8.chaos.test.ts` (`offline fallback explicit`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1109-INT | FR-P8-1109 | 8 | P0 | IT | Webhook dispatch remains outbound-only and idempotent | `[INT] test/phase8.modules.test.ts` (`outbound webhooks with idempotency`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1110-SEC | FR-P8-1110 | 8 | P0 | SEC | Webhook verification exposes valid signature evidence and algorithm metadata | `[INT][SEC] test/phase8.modules.test.ts`, `test/phase8.security.test.ts` | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1111-INT | FR-P8-1111 | 8 | P1 | IT | Integration control health endpoint reports tenant client/delivery state | `[INT] test/phase8.modules.test.ts` (`health visibility`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1112-INT | FR-P8-1112 | 8 | P1 | IT | Webhook failure path remains explicit with retry/failed state transitions | `[INT][CHAOS] test/phase8.chaos.test.ts` (`network failures with explicit retry path`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1113-INT | FR-P8-1113 | 8 | P0 | IT | Compliance export rows include legal-hold, retention, and immutability metadata | `[INT] test/phase8.modules.test.ts` (`retention metadata`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1114-INT | FR-P8-1114 | 8 | P1 | IT | Compliance retention view exposes append-only contract and hold summary | `[INT] test/phase8.modules.test.ts` (`retention view`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1115-INT | FR-P8-1115 | 8 | P1 | IT | Compliance export pagination contract remains explicit and bounded | `[INT] test/phase8.modules.test.ts` (`compliance exports pagination`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1116-E2E | FR-P8-1116 | 8 | P2 | E2E | Compliance CSV/JSON exports include aligned governance columns | `[E2E] e2e/phase8.extensions.spec.ts` (`compliance export includes legal-hold fields`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1117-SEC | FR-P8-1117 | 8 | P1 | SEC | Predictive action feature flag defaults OFF and fails closed | `[SEC] test/phase8.security.test.ts` (`feature-flag fail-closed behavior`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1118-SEC | FR-P8-1118 | 8 | P1 | SEC | Ops enhancement feature flag defaults OFF and fails closed | `[SEC] test/phase8.security.test.ts` (`feature-flag fail-closed behavior`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1119-SEC | FR-P8-1119 | 8 | P0 | SEC | Phase 8 routes reject cross-tenant access attempts with 403 | `[INT][SEC] test/phase8.modules.test.ts`, `test/phase8.security.test.ts` | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1120-LOAD | FR-P8-1120 | 8 | P0 | PERF | Phase 8 release gate passes with no Phase 1-7 regression and budget compliance | `[LOAD][SEC] test/phase8.performance.test.ts`, `scripts/ci-gate.ts`, `npm run ci:gate` | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
 
 ---
 

@@ -1,7 +1,7 @@
 # Cosmic Forge Grocery POS
-## Report Catalog v1.8
+## Report Catalog v1.9
 
-Version: v1.8  
+Version: v1.9  
 Status: Draft for Review  
 Date: 2026-02-20  
 Owner: Application Owner  
@@ -795,6 +795,78 @@ Compliance export fields:
 9. `actor_user_id`
 10. `created_at`
 11. `legal_hold_active`
+
+### 5.6 Phase 8 Actionable Intelligence Datasets (FR-P8-1101..FR-P8-1120)
+
+Traceability map:
+1. Predictive action datasets: `FR-P8-1101..FR-P8-1104`
+2. Ops insight/advisory datasets: `FR-P8-1105..FR-P8-1108`
+3. Webhook/control and compliance retention evidence datasets: `FR-P8-1109..FR-P8-1118`
+4. Security/regression governance contracts: `FR-P8-1119..FR-P8-1120`
+
+Governed endpoints:
+- `GET /api/v1/tenants/{tenantId}/predictive/actions`
+- `POST /api/v1/tenants/{tenantId}/predictive/actions/{actionId}/act`
+- `GET /api/v1/tenants/{tenantId}/observability/insights?page={n}&pageSize={m}`
+- `GET /api/v1/tenants/{tenantId}/scale-guard/advisory`
+- `GET /api/v1/tenants/{tenantId}/webhooks/control/health`
+- `GET /api/v1/tenants/{tenantId}/compliance/exports`
+- `GET /api/v1/tenants/{tenantId}/compliance/exports/retention`
+
+Feature-flag contract (default OFF):
+1. `phase8_predictive_actions` gates predictive action read/write endpoints.
+2. `phase8_ops_enhancements` gates insight/advisory dataset endpoints.
+
+Predictive action dataset fields:
+1. `action_id`
+2. `tenant_id`
+3. `branch_id`
+4. `dataset` (`SLA`/`TREND`)
+5. `metric`
+6. `severity` (`INFO`/`WARN`/`CRITICAL`)
+7. `status` (`OPEN`/`ACKNOWLEDGED`/`EXECUTED`/`DISMISSED`)
+8. `title`
+9. `description`
+10. `recommendation`
+11. `source_ref`
+12. `created_at`
+13. `updated_at`
+
+Insights dataset fields:
+1. summary:
+   - `alertCount`
+   - `actionCount`
+   - `criticalActions`
+   - `pendingQueue`
+   - `offlineFallback`
+2. severity legend:
+   - `INFO`
+   - `WARN`
+   - `CRITICAL`
+3. paginated action rows with `page`, `pageSize`, `totalRows`, `totalPages`, `limitMax`
+
+Scale advisory fields:
+1. `throughputClass` (`LOW`/`MEDIUM`/`HIGH`)
+2. `avgReadLatencyMs`
+3. `readSamples`
+4. `cache.entries`
+5. `cache.totalHits`
+6. `cache.expiredEntries`
+7. `cache.hitRatePct`
+8. `hints[]`
+9. `mode`
+
+Compliance export governance fields:
+1. `legal_hold_active`
+2. `retention_days`
+3. `retention_expires_at`
+4. `immutable_record`
+
+Compliance retention view fields:
+1. `appendOnlyContract`
+2. `retention` (policy object)
+3. `legalHold.activeCount`
+4. `legalHold.activeScopes`
 
 ---
 

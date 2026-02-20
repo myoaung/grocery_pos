@@ -11,6 +11,13 @@ const jobsQuerySchema = z.object({
   jobType: z.string().min(1).optional(),
 });
 
+const insightsQuerySchema = z.object({
+  severity: z.enum(["INFO", "WARN", "CRITICAL"]).optional(),
+  status: z.enum(["OPEN", "ACKNOWLEDGED", "EXECUTED", "DISMISSED"]).optional(),
+  page: z.coerce.number().int().min(1).default(1),
+  pageSize: z.coerce.number().int().min(1).max(200).default(50),
+});
+
 function withErrorHandling(handler: (req: any, res: any) => Promise<void> | void) {
   return async (req: any, res: any) => {
     try {
@@ -88,6 +95,16 @@ export function createMetricsRouter(store: MemoryStore) {
   );
 
   router.get(
+    "/api/v1/tenants/:tenantId/observability/insights",
+    requireTenantPathMatch(),
+    requirePermission("ops.dashboard.read"),
+    withErrorHandling((req, res) => {
+      const input = parseInput(insightsQuerySchema, req.query);
+      res.json({ item: service.insights(req.ctx, req.params.tenantId, input) });
+    }),
+  );
+
+  router.get(
     "/api/v1/tenants/:tenantId/scale-guard/stats",
     requireTenantPathMatch(),
     requirePermission("scale.guard.read"),
@@ -103,6 +120,15 @@ export function createMetricsRouter(store: MemoryStore) {
     withErrorHandling((req, res) => {
       const prefix = typeof req.query.prefix === "string" && req.query.prefix.length > 0 ? req.query.prefix : "analytics:";
       res.json({ item: service.evictScale(req.ctx, req.params.tenantId, prefix) });
+    }),
+  );
+
+  router.get(
+    "/api/v1/tenants/:tenantId/scale-guard/advisory",
+    requireTenantPathMatch(),
+    requirePermission("scale.guard.read"),
+    withErrorHandling((req, res) => {
+      res.json({ item: service.scaleAdvisory(req.ctx, req.params.tenantId) });
     }),
   );
 

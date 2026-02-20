@@ -1,5 +1,5 @@
 # Cosmic Forge Grocery POS
-## Functional Requirements Document (FRD) v1.2 - Phase 5/6 Addendum
+## Functional Requirements Document (FRD) v1.2 - Phase 5-8 Addendum
 
 Version: v1.2  
 Status: Draft for Review  
@@ -670,6 +670,101 @@ Scope guardrails:
 - Release and gate:
   - `scripts/ci-gate.ts`
   - `docs/TC_traceability_matrix.md` (Phase 7 section)
+
+---
+
+## 13. Phase 8 Actionable Intelligence Requirements (FR-P8-1101..FR-P8-1120)
+
+Scope guardrails:
+1. additive-only implementation.
+2. no behavior drift for Phase 5.x/6/7 runtime contracts.
+3. Phase 8 feature flags default OFF and fail closed.
+4. all routes remain tenant/branch scoped with RBAC enforcement.
+
+### 13.1 Predictive Actions Service (FR-P8-1101..FR-P8-1104)
+
+| FR ID | Priority | Requirement | Acceptance Summary |
+|---|---|---|---|
+| FR-P8-1101 | P0 | Expose predictive actions list endpoint for actionable operational insights. | Endpoint returns paginated action records derived from predictive SLA/trend datasets with tenant/branch scope. |
+| FR-P8-1102 | P0 | Support predictive action decision workflow. | Authorized users can `ACKNOWLEDGE`, `EXECUTE`, or `DISMISS` actions with explicit status transitions. |
+| FR-P8-1103 | P1 | Persist predictive actions with idempotent source references. | Active action dedupe uses deterministic source reference and preserves open-state continuity. |
+| FR-P8-1104 | P1 | Emit predictive action audit and metrics evidence. | Action creation/control writes audit entries and structured metrics for operational traceability. |
+
+### 13.2 Ops Dashboard Enhancements (FR-P8-1105..FR-P8-1108)
+
+| FR ID | Priority | Requirement | Acceptance Summary |
+|---|---|---|---|
+| FR-P8-1105 | P1 | Expose enriched observability insights endpoint for ops UI. | Endpoint returns severity legend, action/alert summary, and paginated actionable rows. |
+| FR-P8-1106 | P1 | Provide severity/status filter controls for actionable insights. | Query filters for `severity` and `status` are validated and applied non-silently. |
+| FR-P8-1107 | P2 | Add scale advisory endpoint for throughput/cache hints. | Advisory output includes throughput class, latency summary, cache hit-rate, and optimization hints. |
+| FR-P8-1108 | P2 | Ops UI must display offline fallback and severity-coded indicators. | Dashboard UI surfaces offline banner, severity pill system, and filtered action controls for tenant context. |
+
+### 13.3 Webhooks and Integration Control Expansion (FR-P8-1109..FR-P8-1112)
+
+| FR ID | Priority | Requirement | Acceptance Summary |
+|---|---|---|---|
+| FR-P8-1109 | P0 | Webhook dispatch output must remain outbound-only and idempotent. | Duplicate idempotency keys do not fan out duplicate deliveries; response marks outbound-only contract. |
+| FR-P8-1110 | P0 | Webhook verification evidence must expose signature algorithm and validity. | Delivery verification endpoint returns deterministic signature validity metadata. |
+| FR-P8-1111 | P1 | Integration control health endpoint must summarize client and delivery state. | Endpoint returns tenant-scoped counts for client enablement, kill-switch usage, and delivery lifecycle state. |
+| FR-P8-1112 | P1 | Webhook failure states must remain explicit and retryable. | Forced/network failures transition to `RETRYING`/`FAILED` with no silent success state. |
+
+### 13.4 Compliance and Audit Export Enhancements (FR-P8-1113..FR-P8-1116)
+
+| FR ID | Priority | Requirement | Acceptance Summary |
+|---|---|---|---|
+| FR-P8-1113 | P0 | Compliance export rows must include retention and legal-hold governance fields. | Export rows include `retention_days`, `retention_expires_at`, `legal_hold_active`, and immutable markers. |
+| FR-P8-1114 | P1 | Compliance retention view must expose append-only and legal-hold state summary. | Endpoint returns append-only contract signal with active hold scopes/counts and retention policy values. |
+| FR-P8-1115 | P1 | Compliance export pagination contract must stay explicit. | `page`, `pageSize`, `totalRows`, `totalPages`, `limitMax` are returned for collection responses. |
+| FR-P8-1116 | P2 | Compliance export output must preserve CSV/JSON parity for governance fields. | CSV and JSON datasets include aligned legal-hold and retention metadata columns. |
+
+### 13.5 Feature Flags and Scale Guard Additions (FR-P8-1117..FR-P8-1118)
+
+| FR ID | Priority | Requirement | Acceptance Summary |
+|---|---|---|---|
+| FR-P8-1117 | P1 | Add tenant-scoped feature flag for predictive actions. | `phase8_predictive_actions` defaults OFF and gates all predictive action read/write routes fail closed. |
+| FR-P8-1118 | P1 | Add tenant-scoped feature flag for ops enhancements. | `phase8_ops_enhancements` defaults OFF and gates insights/advisory/dashboard enhancement flows fail closed. |
+
+### 13.6 Security and Regression Contracts (FR-P8-1119..FR-P8-1120)
+
+| FR ID | Priority | Requirement | Acceptance Summary |
+|---|---|---|---|
+| FR-P8-1119 | P0 | Phase 8 routes must enforce tenant/branch isolation and RBAC. | Cross-tenant access attempts are rejected (`403`) across predictive/compliance/webhook/intelligence routes. |
+| FR-P8-1120 | P0 | Phase 8 rollout must preserve prior phase behavior and pass gate checks. | Build/test/e2e/perf/security/chaos/ci gate pass with no regressions in Phases 1-7 runtime behavior. |
+
+## 14. Phase 8 References
+
+- Modules:
+  - `src/modules/analytics/predictiveActionsService.ts`
+  - `src/modules/analytics/predictiveActionsRoutes.ts`
+  - `src/modules/observability/metricsService.ts`
+  - `src/modules/observability/metricsRoutes.ts`
+  - `src/modules/webhooks/integrationControlService.ts`
+  - `src/modules/webhooks/webhookService.ts`
+  - `src/modules/webhooks/webhookRoutes.ts`
+  - `src/modules/compliance/complianceService.ts`
+  - `src/modules/compliance/complianceRoutes.ts`
+  - `src/services/scaleGuardService.ts`
+- Shared contracts and flags:
+  - `src/types.ts`
+  - `src/config/coreContracts.ts`
+  - `src/store/memoryStore.ts`
+  - `src/services/featureFlagService.ts`
+  - `src/config/permissions.ts`
+  - `src/routes/api.ts`
+- UI:
+  - `web/ops-dashboard.html`
+  - `web/ops-dashboard.js`
+  - `web/ops-dashboard.css`
+- Test evidence:
+  - `test/phase8.modules.test.ts`
+  - `test/phase8.performance.test.ts`
+  - `test/phase8.security.test.ts`
+  - `test/phase8.chaos.test.ts`
+  - `e2e/phase8.extensions.spec.ts`
+- Release and traceability:
+  - `scripts/full-sync-phase1-8.sh`
+  - `docs/TC_traceability_matrix.md` (Phase 8 section)
+  - `docs/change_log.md` (v1.15)
 
 ---
 

@@ -624,6 +624,32 @@ export interface TenantSlaMetricSnapshot {
   auditWriteLatencyP95Ms: number;
 }
 
+export type PredictiveActionDataset = "SLA" | "TREND";
+
+export type PredictiveActionSeverity = "INFO" | "WARN" | "CRITICAL";
+
+export type PredictiveActionStatus = "OPEN" | "ACKNOWLEDGED" | "EXECUTED" | "DISMISSED";
+
+export interface PredictiveActionRecord {
+  actionId: string;
+  tenantId: string;
+  branchId: string;
+  dataset: PredictiveActionDataset;
+  metric: string;
+  severity: PredictiveActionSeverity;
+  title: string;
+  description: string;
+  recommendation: string;
+  sourceRef: string;
+  status: PredictiveActionStatus;
+  acknowledgedBy?: string;
+  acknowledgedAt?: string;
+  executedBy?: string;
+  executedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type FeatureFlagKey =
   | "advanced_discounts"
   | "loyalty_rules"
@@ -638,4 +664,6 @@ export type FeatureFlagKey =
   | "phase7_predictive"
   | "phase7_integration_control"
   | "phase7_compliance_exports"
-  | "phase7_scale_guard";
+  | "phase7_scale_guard"
+  | "phase8_predictive_actions"
+  | "phase8_ops_enhancements";

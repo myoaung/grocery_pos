@@ -110,6 +110,15 @@ export function createComplianceRouter(store: MemoryStore) {
     }),
   );
 
+  router.get(
+    "/api/v1/tenants/:tenantId/compliance/exports/retention",
+    requireTenantPathMatch(),
+    requirePermission("compliance.export.read"),
+    withErrorHandling((req, res) => {
+      res.json({ item: service.retentionView(req.ctx, req.params.tenantId) });
+    }),
+  );
+
   router.post(
     "/api/v1/tenants/:tenantId/compliance/legal-holds",
     requireTenantPathMatch(),
