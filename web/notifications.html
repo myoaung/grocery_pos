@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cosmic Forge Notifications</title>
+    <link rel="stylesheet" href="./notifications.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="top">
+        <div>
+          <p class="label">Phase 3</p>
+          <h1>Notifications Center</h1>
+          <p id="ctxText" class="muted">tenant-a / branch-a-1 / MANAGER</p>
+        </div>
+        <div class="actions">
+          <a class="btn ghost" href="./dashboard.html">Dashboard</a>
+          <a class="btn ghost" href="./">POS Console</a>
+        </div>
+      </header>
+
+      <section id="modeBanner" class="banner hidden"></section>
+
+      <section class="grid">
+        <article class="card">
+          <h2>Trigger Notification</h2>
+          <form id="triggerForm" class="form">
+            <select id="eventTypeInput">
+              <option value="LOYALTY_POINTS">LOYALTY_POINTS</option>
+              <option value="LOW_STOCK">LOW_STOCK</option>
+              <option value="OFFLINE_CONFLICT">OFFLINE_CONFLICT</option>
+              <option value="SYSTEM_EVENT">SYSTEM_EVENT</option>
+            </select>
+            <select id="severityInput">
+              <option value="INFO">INFO</option>
+              <option value="WARN">WARN</option>
+              <option value="READ_ONLY">READ_ONLY</option>
+              <option value="BLOCK">BLOCK</option>
+            </select>
+            <input id="titleInput" placeholder="Title" value="Operational Notice" required />
+            <textarea id="bodyInput" rows="3" placeholder="Body" required>System event published from notifications center.</textarea>
+            <label class="check">
+              <input id="forceQueueInput" type="checkbox" />
+              Force queue (simulate offline send)
+            </label>
+            <button class="btn" type="submit">Trigger</button>
+          </form>
+          <pre id="triggerOut" class="code"></pre>
+        </article>
+
+        <article class="card">
+          <h2>Connectivity & Retry</h2>
+          <div class="row">
+            <button id="goOfflineBtn" class="btn warn">Set Offline</button>
+            <button id="goOnlineBtn" class="btn">Set Online</button>
+            <button id="retryBtn" class="btn ghost">Retry Queue</button>
+          </div>
+          <pre id="retryOut" class="code"></pre>
+        </article>
+      </section>
+
+      <section class="card">
+        <div class="row spread">
+          <h2>Notification Feed</h2>
+          <button id="refreshBtn" class="btn ghost">Refresh</button>
+        </div>
+        <div id="toastMount" class="toasts"></div>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Type</th>
+              <th>Severity</th>
+              <th>Status</th>
+              <th>Title</th>
+              <th>Read</th>
+            </tr>
+          </thead>
+          <tbody id="feedBody"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script type="module" src="./notifications.js"></script>
+  </body>
+</html>

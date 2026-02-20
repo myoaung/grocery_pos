@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cosmic Forge Grocery POS</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="logo-badge" id="tenantLogo">TA</div>
+        <nav>
+          <a href="#" class="nav-item active">Dashboard</a>
+          <a href="#" class="nav-item">Sales</a>
+          <a href="#" class="nav-item">Products</a>
+          <a href="#" class="nav-item">Inventory</a>
+          <a href="#" class="nav-item">Customers</a>
+          <a href="#" class="nav-item">Reports</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <h1 id="appName">Cosmic Forge Grocery POS</h1>
+            <p id="tenantName">Tenant A Store</p>
+          </div>
+          <div class="status-group">
+            <span class="pill" id="connectionState">ONLINE</span>
+            <span class="pill" id="modeState">ACTIVE</span>
+            <a class="pill pill-link" href="./dashboard.html">PHASE 2 DASHBOARD</a>
+            <a class="pill pill-link" href="./ops-dashboard.html">PHASE 7 OPS</a>
+            <a class="pill pill-link" href="./notifications.html">PHASE 3 NOTIFY</a>
+          </div>
+        </header>
+
+        <section id="alertBanner" class="alert hidden" aria-live="polite"></section>
+        <section id="explanationPanel" class="explanation hidden" aria-live="polite">
+          <strong id="explanationCode"></strong>
+          <p id="explanationMessage"></p>
+        </section>
+
+        <section class="card-grid">
+          <article class="card">
+            <h2>Offline Queue</h2>
+            <p class="metric" id="queueCount">0</p>
+            <button id="syncBtn" class="btn">Sync Queue</button>
+          </article>
+          <article class="card">
+            <h2>Open Conflicts</h2>
+            <p class="metric" id="conflictCount">0</p>
+            <p class="hint">Non-silent conflict handling enforced</p>
+          </article>
+          <article class="card">
+            <h2>Read-Only Fallback</h2>
+            <p class="metric" id="readonlyState">OFF</p>
+            <p class="hint">Cashier/Inventory writes blocked when conflict exists</p>
+          </article>
+          <article class="card">
+            <h2>Risk Session</h2>
+            <p class="metric" id="riskModeState">ALLOW</p>
+            <p class="hint" id="riskFactors">No elevated signals</p>
+          </article>
+          <article class="card">
+            <h2>Loyalty Wallet</h2>
+            <p class="metric" id="loyaltyPointsState">0</p>
+            <div class="row">
+              <input id="loyaltyCustomerId" value="cust-a-1" />
+              <button id="loyaltyRefreshBtn" class="btn secondary">Check</button>
+            </div>
+            <button id="loyaltyRedeemBtn" class="btn secondary">Redeem Popup</button>
+          </article>
+          <article class="card">
+            <h2>Offline Enhanced</h2>
+            <p class="metric" id="offlinePendingState">0</p>
+            <p class="hint" id="offlineStatusHint">Pending loyalty/report queue items</p>
+          </article>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Queued Transactions</h3>
+            <button id="refreshBtn" class="btn secondary">Refresh</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Queue ID</th>
+                <th>Type</th>
+                <th>State</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody id="queueTable"></tbody>
+          </table>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Conflicts</h3>
+            <button id="resolveFirstBtn" class="btn secondary">Resolve First Conflict</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Conflict ID</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody id="conflictTable"></tbody>
+          </table>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Reporting Extensions</h3>
+            <button id="runExtReportBtn" class="btn secondary">Run</button>
+          </div>
+          <div class="row">
+            <select id="extTemplateSelect">
+              <option value="REP-X-LOY-001">REP-X-LOY-001</option>
+              <option value="REP-X-LOY-002">REP-X-LOY-002</option>
+              <option value="REP-X-OPS-001">REP-X-OPS-001</option>
+              <option value="REP-X-OPS-002">REP-X-OPS-002</option>
+            </select>
+            <button id="extCsvBtn" class="btn secondary">CSV</button>
+            <button id="extPdfBtn" class="btn secondary">PDF</button>
+            <button id="extPrintBtn" class="btn secondary">Print</button>
+          </div>
+          <pre id="extReportOutput" class="report-output"></pre>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h3>Phase 5.1 Hardening Extensions</h3>
+          </div>
+          <p class="hint">Policy Version: <span id="discountPolicyState">Loading...</span></p>
+          <div class="row">
+            <input id="discountProductId" value="prod-a-001" />
+            <input id="discountQty" type="number" value="5" min="1" step="1" />
+            <input id="discountCustomerId" value="cust-a-1" />
+            <input id="discountCouponCode" value="WEEKEND5" />
+            <input id="discountManualPct" type="number" value="0" min="0" max="10" step="0.5" />
+            <button id="discountPreviewBtn" class="btn secondary">Preview Discount</button>
+            <button id="discountApplyBtn" class="btn secondary">Apply Discount</button>
+          </div>
+          <pre id="phase5DiscountOutput" class="report-output"></pre>
+          <div class="panel mini-panel">
+            <h4>Discount Breakdown (Read-Only)</h4>
+            <div id="phase5DiscountSummary" class="hint">No discount evaluation yet.</div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Rule</th>
+                  <th>Pct</th>
+                  <th>Reason</th>
+                </tr>
+              </thead>
+              <tbody id="phase5DiscountRulesTable"></tbody>
+            </table>
+            <h5>Policy Rejection Reason Codes</h5>
+            <ul id="phase5DiscountReasons" class="hint-list"></ul>
+          </div>
+          <div class="row">
+            <select id="riskActionInput">
+              <option value="READ">READ</option>
+              <option value="WRITE">WRITE</option>
+            </select>
+            <label><input id="riskVpnInput" type="checkbox" /> VPN</label>
+            <label><input id="riskRestrictedInput" type="checkbox" /> Restricted Location</label>
+            <label><input id="riskDeviceInput" type="checkbox" /> Untrusted Device</label>
+            <button id="riskEvaluateBtn" class="btn secondary">Evaluate Risk/Compliance</button>
+          </div>
+          <pre id="phase5RiskOutput" class="report-output"></pre>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

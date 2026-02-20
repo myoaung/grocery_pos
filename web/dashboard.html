@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cosmic Forge Admin Dashboard</title>
+    <link rel="stylesheet" href="./dashboard.css" />
+  </head>
+  <body>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="brand-card">
+          <div id="tenantLogo" class="logo">TA</div>
+          <div>
+            <p class="eyebrow">Cosmic Forge</p>
+            <h1 id="tenantName">Tenant A Store</h1>
+          </div>
+        </div>
+
+        <nav class="nav">
+          <a href="#overview">Overview</a>
+          <a href="#management">Tenant & Users</a>
+          <a href="#reports">Advanced Reports</a>
+          <a href="#phase4">Phase 4 Extensions</a>
+          <a href="#phase5">Phase 5 Modules</a>
+          <a href="#plugins">Plugins</a>
+          <a href="#offline">Offline Automation</a>
+          <a href="#audit" id="navAudit">Admin Audit</a>
+        </nav>
+
+        <div class="session">
+          <p><strong>Role:</strong> <span id="ctxRole">MANAGER</span></p>
+          <p><strong>Branch:</strong> <span id="ctxBranch">branch-a-1</span></p>
+          <p><strong>Risk:</strong> <span id="riskMode">ALLOW</span></p>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Phase 2 Control Plane</p>
+            <h2 id="appName">Cosmic Forge Grocery POS</h2>
+          </div>
+          <div class="topbar-actions">
+            <button id="refreshAllBtn" class="btn">Refresh All</button>
+            <a class="btn ghost" href="./ops-dashboard.html">Ops Dashboard</a>
+            <a class="btn ghost" href="./notifications.html">Notifications</a>
+            <a class="btn ghost" href="./">Phase 1 Console</a>
+          </div>
+        </header>
+
+        <section id="banner" class="banner hidden"></section>
+
+        <section id="overview" class="panel">
+          <h3>Overview</h3>
+          <div class="kpi-grid">
+            <article class="kpi"><p>Sales Today</p><h4 id="kpiSales">0</h4></article>
+            <article class="kpi"><p>Receipts</p><h4 id="kpiReceipts">0</h4></article>
+            <article class="kpi"><p>Avg Receipt</p><h4 id="kpiAvg">0</h4></article>
+            <article class="kpi"><p>Low Stock</p><h4 id="kpiLowStock">0</h4></article>
+            <article class="kpi"><p>Customers</p><h4 id="kpiCustomers">0</h4></article>
+            <article class="kpi"><p>Open Conflicts</p><h4 id="kpiConflicts">0</h4></article>
+          </div>
+          <div class="chart-grid">
+            <article class="chart-card">
+              <h4>Sales Pulse</h4>
+              <div id="chartSales" class="bars"></div>
+            </article>
+            <article class="chart-card">
+              <h4>Inventory Mix</h4>
+              <div id="chartInventory" class="bars"></div>
+            </article>
+            <article class="chart-card">
+              <h4>Customer Mix</h4>
+              <div id="chartCustomers" class="bars"></div>
+            </article>
+          </div>
+        </section>
+
+        <section id="management" class="panel">
+          <h3>Tenant / Branch / User Management</h3>
+          <div class="split">
+            <div>
+              <h4>Branches</h4>
+              <ul id="branchList" class="list"></ul>
+              <form id="branchForm" class="inline-form">
+                <input type="text" id="branchCodeInput" placeholder="Branch Code" required />
+                <input type="text" id="branchNameInput" placeholder="Branch Name" required />
+                <button class="btn" type="submit">Add Branch</button>
+              </form>
+            </div>
+            <div>
+              <h4>Users</h4>
+              <ul id="userList" class="list"></ul>
+              <form id="userForm" class="inline-form">
+                <input type="email" id="userEmailInput" placeholder="user@tenant.local" required />
+                <select id="userRoleInput">
+                  <option value="MANAGER">MANAGER</option>
+                  <option value="CASHIER">CASHIER</option>
+                  <option value="INVENTORY_STAFF">INVENTORY_STAFF</option>
+                </select>
+                <input type="text" id="userBranchInput" placeholder="branch-a-1" required />
+                <button class="btn" type="submit">Create User</button>
+              </form>
+            </div>
+          </div>
+          <form id="brandForm" class="inline-form">
+            <input type="text" id="brandTenantNameInput" placeholder="Tenant Name" />
+            <input type="text" id="brandLogoInput" placeholder="Logo Text" />
+            <input type="text" id="brandPrimaryInput" placeholder="#1d4ed8" />
+            <input type="text" id="brandAccentInput" placeholder="#60a5fa" />
+            <button class="btn" type="submit">Update Branding</button>
+          </form>
+        </section>
+
+        <section id="reports" class="panel">
+          <h3>Advanced Reporting</h3>
+          <div class="split">
+            <div>
+              <h4>Templates</h4>
+              <ul id="templateList" class="list"></ul>
+            </div>
+            <div>
+              <h4>Run Report</h4>
+              <form id="reportForm" class="inline-form">
+                <select id="reportIdInput">
+                  <option value="REP-A-001">REP-A-001</option>
+                  <option value="REP-A-002">REP-A-002</option>
+                  <option value="REP-A-003">REP-A-003</option>
+                  <option value="REP-A-004">REP-A-004</option>
+                </select>
+                <input type="date" id="reportFromInput" />
+                <input type="date" id="reportToInput" />
+                <input type="text" id="compareTenantInput" placeholder="compareTenantId (owner only)" />
+                <button class="btn" type="submit">Generate</button>
+                <button id="exportCsvBtn" class="btn ghost" type="button">CSV</button>
+                <button id="exportPdfBtn" class="btn ghost" type="button">PDF</button>
+              </form>
+              <pre id="reportOutput" class="code"></pre>
+            </div>
+          </div>
+        </section>
+
+        <section id="phase4" class="panel">
+          <h3>Phase 4 Extensions</h3>
+          <div class="split">
+            <div>
+              <h4>Loyalty & Rewards Engine</h4>
+              <p class="eyebrow">Members: <strong id="rewardMembers">0</strong></p>
+              <p class="eyebrow">Active: <strong id="rewardActive">0</strong></p>
+              <p class="eyebrow">Accrued: <strong id="rewardAccrued">0</strong></p>
+              <p class="eyebrow">Redeemed: <strong id="rewardRedeemed">0</strong></p>
+              <form id="rewardActionForm" class="inline-form">
+                <select id="rewardActionInput">
+                  <option value="ACCRUE">ACCRUE</option>
+                  <option value="REDEEM">REDEEM</option>
+                </select>
+                <input type="text" id="rewardCustomerInput" value="cust-a-1" required />
+                <input type="number" id="rewardPointsInput" value="120" min="1" step="1" required />
+                <button class="btn" type="submit">Apply Reward Action</button>
+              </form>
+              <ul id="rewardHistoryList" class="list"></ul>
+            </div>
+            <div>
+              <h4>Offline Enhancements</h4>
+              <p class="eyebrow" id="offlineEnhancedSummary">Pending: 0 | Failed: 0 | Conflict: 0</p>
+              <form id="queueReportForm" class="inline-form">
+                <input type="text" id="offlineTemplateInput" value="REP-X-OPS-001" required />
+                <button class="btn ghost" type="submit">Queue Report Request</button>
+                <button id="offlineReconcileBtn" class="btn ghost" type="button">Reconcile</button>
+              </form>
+              <ul id="offlineEventList" class="list"></ul>
+            </div>
+          </div>
+          <div class="split">
+            <div>
+              <h4>Reporting Extension Templates</h4>
+              <ul id="extTemplateList" class="list"></ul>
+            </div>
+            <div>
+              <h4>Run Reporting Extension</h4>
+              <form id="extReportForm" class="inline-form">
+                <input type="text" id="extTemplateInput" value="REP-X-LOY-001" required />
+                <button class="btn" type="submit">Generate</button>
+                <button id="extExportCsvBtn" class="btn ghost" type="button">CSV</button>
+                <button id="extExportPdfBtn" class="btn ghost" type="button">PDF</button>
+                <button id="extExportPrintBtn" class="btn ghost" type="button">PRINT</button>
+              </form>
+              <pre id="extReportOutput" class="code"></pre>
+            </div>
+          </div>
+        </section>
+
+        <section id="phase5" class="panel">
+          <h3>Phase 5 Modules</h3>
+          <div class="split">
+            <div>
+              <h4>Advanced Discounts</h4>
+              <form id="phase5DiscountForm" class="inline-form">
+                <input type="text" id="phase5DiscountProductId" value="prod-a-001" required />
+                <input type="number" id="phase5DiscountQty" value="6" min="1" step="1" required />
+                <input type="text" id="phase5DiscountCustomerId" value="cust-a-1" />
+                <input type="text" id="phase5DiscountCouponCode" value="WEEKEND5" />
+                <input type="number" id="phase5DiscountManualPct" value="0" min="0" max="10" step="0.5" />
+                <button class="btn" type="submit">Apply Advanced Discount</button>
+              </form>
+              <pre id="phase5DiscountOutput" class="code"></pre>
+            </div>
+            <div>
+              <h4>Multi-Store Reporting</h4>
+              <form id="phase5ReportForm" class="inline-form">
+                <select id="phase5ReportKey">
+                  <option value="summary">summary</option>
+                  <option value="inventory-risk">inventory-risk</option>
+                  <option value="discount-compliance">discount-compliance</option>
+                </select>
+                <button class="btn" type="submit">Run Multi-Store Report</button>
+                <button id="phase5ExportCsvBtn" class="btn ghost" type="button">CSV</button>
+                <button id="phase5ExportPdfBtn" class="btn ghost" type="button">PDF</button>
+              </form>
+              <pre id="phase5ReportOutput" class="code"></pre>
+            </div>
+          </div>
+          <div class="split">
+            <div>
+              <h4>Risk / Compliance Policies</h4>
+              <form id="phase5RiskPolicyForm" class="inline-form">
+                <input type="text" id="phase5PolicyName" value="Dashboard READ_ONLY policy" required />
+                <select id="phase5PolicyScope">
+                  <option value="BRANCH">BRANCH</option>
+                  <option value="TENANT">TENANT</option>
+                </select>
+                <select id="phase5PolicyMode">
+                  <option value="WARN">WARN</option>
+                  <option value="READ_ONLY">READ_ONLY</option>
+                  <option value="BLOCK">BLOCK</option>
+                </select>
+                <label><input id="phase5PolicyVpn" type="checkbox" checked /> VPN</label>
+                <label><input id="phase5PolicyRestricted" type="checkbox" /> Restricted</label>
+                <label><input id="phase5PolicyDevice" type="checkbox" /> Untrusted</label>
+                <button class="btn" type="submit">Save Policy</button>
+              </form>
+              <pre id="phase5PolicyOutput" class="code"></pre>
+            </div>
+            <div>
+              <h4>Risk / Compliance Evaluate</h4>
+              <form id="phase5RiskEvalForm" class="inline-form">
+                <select id="phase5RiskAction">
+                  <option value="READ">READ</option>
+                  <option value="WRITE">WRITE</option>
+                </select>
+                <label><input id="phase5RiskVpn" type="checkbox" checked /> VPN</label>
+                <label><input id="phase5RiskRestricted" type="checkbox" /> Restricted</label>
+                <label><input id="phase5RiskDevice" type="checkbox" /> Untrusted</label>
+                <button class="btn" type="submit">Evaluate</button>
+              </form>
+              <pre id="phase5RiskOutput" class="code"></pre>
+              <h4>Compliance Events</h4>
+              <ul id="phase5RiskEvents" class="list"></ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="plugins" class="panel">
+          <h3>Marketplace / Payment Plugins</h3>
+          <div class="split">
+            <div>
+              <h4>Available Plugins</h4>
+              <ul id="pluginCatalog" class="list"></ul>
+              <form id="registerPluginForm" class="inline-form">
+                <input type="text" id="registerPluginId" value="mock-gateway-v1" required />
+                <button class="btn" type="submit">Register Plugin</button>
+              </form>
+            </div>
+            <div>
+              <h4>Charge (Sandbox)</h4>
+              <form id="chargeForm" class="inline-form">
+                <input type="text" id="chargePluginId" value="mock-gateway-v1" required />
+                <input type="number" id="chargeAmount" value="10000" min="1" step="1" required />
+                <input type="text" id="chargeOrderRef" value="ORDER-001" required />
+                <button class="btn" type="submit">Charge</button>
+              </form>
+              <pre id="chargeOutput" class="code"></pre>
+            </div>
+          </div>
+        </section>
+
+        <section id="offline" class="panel">
+          <h3>Offline Automation & Alerts</h3>
+          <div class="split">
+            <div>
+              <button id="runAutomationBtn" class="btn">Run Automation</button>
+              <pre id="automationOutput" class="code"></pre>
+            </div>
+            <div>
+              <h4>Alerts</h4>
+              <ul id="alertList" class="list"></ul>
+            </div>
+          </div>
+        </section>
+
+        <section id="audit" class="panel">
+          <h3>Admin Audit View (Read-Only)</h3>
+          <p id="auditAccessHint" class="eyebrow">Admin roles only: APPLICATION_OWNER, TENANT_OWNER, MANAGER</p>
+          <div class="inline-form">
+            <select id="auditSeverityFilter">
+              <option value="">ALL SEVERITY</option>
+              <option value="INFO">INFO</option>
+              <option value="WARN">WARN</option>
+              <option value="CRITICAL">CRITICAL</option>
+            </select>
+            <button id="auditRefreshBtn" class="btn" type="button">Refresh Audit</button>
+          </div>
+          <pre id="auditIntegrity" class="code"></pre>
+          <ul id="auditList" class="list"></ul>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./dashboard.js"></script>
+  </body>
+</html>

@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cosmic Forge Ops Dashboard</title>
+    <link rel="stylesheet" href="./ops-dashboard.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div>
+        <p class="eyebrow">Phase 7 Operational Intelligence</p>
+        <h1>Operations Dashboard</h1>
+      </div>
+      <div class="actions">
+        <button id="refreshBtn" class="btn">Refresh</button>
+        <a class="btn ghost" href="./dashboard.html">Admin Dashboard</a>
+      </div>
+    </header>
+
+    <section id="banner" class="banner hidden"></section>
+
+    <section class="panel">
+      <h2>Observability Health</h2>
+      <div class="cards">
+        <article class="card"><p>Metrics (1h)</p><h3 id="cardMetrics">0</h3></article>
+        <article class="card"><p>Aggregation Queued</p><h3 id="cardQueued">0</h3></article>
+        <article class="card"><p>Aggregation Running</p><h3 id="cardRunning">0</h3></article>
+        <article class="card"><p>Webhook Retrying</p><h3 id="cardRetrying">0</h3></article>
+        <article class="card"><p>Cache Entries</p><h3 id="cardCache">0</h3></article>
+      </div>
+      <pre id="slaOutput" class="code"></pre>
+    </section>
+
+    <section class="panel split">
+      <article>
+        <h2>Active Alerts</h2>
+        <ul id="alertList" class="list"></ul>
+      </article>
+      <article>
+        <h2>Job Metrics</h2>
+        <ul id="jobList" class="list"></ul>
+      </article>
+    </section>
+
+    <section class="panel split">
+      <article>
+        <h2>Predictive SLA</h2>
+        <form id="slaForm" class="inline">
+          <label>Horizon Days <input id="slaHorizonInput" type="number" min="1" max="30" value="7" /></label>
+          <button class="btn" type="submit">Predict</button>
+          <button id="slaExportBtn" class="btn ghost" type="button">Export CSV</button>
+        </form>
+        <pre id="predictiveSlaOutput" class="code"></pre>
+      </article>
+      <article>
+        <h2>Predictive Trends</h2>
+        <form id="trendForm" class="inline">
+          <label>
+            Metric
+            <select id="trendMetricInput">
+              <option value="net_sales">net_sales</option>
+              <option value="receipts">receipts</option>
+              <option value="queue_pending">queue_pending</option>
+            </select>
+          </label>
+          <label>History <input id="trendHistoryInput" type="number" min="7" max="180" value="30" /></label>
+          <label>Forecast <input id="trendForecastInput" type="number" min="1" max="30" value="7" /></label>
+          <button class="btn" type="submit">Predict</button>
+          <button id="trendExportBtn" class="btn ghost" type="button">Export CSV</button>
+        </form>
+        <pre id="predictiveTrendOutput" class="code"></pre>
+      </article>
+    </section>
+
+    <section class="panel split">
+      <article>
+        <h2>Integration Control Plane</h2>
+        <form id="clientForm" class="inline">
+          <input id="clientNameInput" type="text" placeholder="Client name" required />
+          <input id="clientDescInput" type="text" placeholder="Description" />
+          <button class="btn" type="submit">Register Client</button>
+        </form>
+        <ul id="clientList" class="list"></ul>
+      </article>
+      <article>
+        <h2>Compliance / Legal Hold</h2>
+        <form id="legalHoldForm" class="inline">
+          <select id="legalScopeInput">
+            <option value="TENANT">TENANT</option>
+            <option value="BRANCH">BRANCH</option>
+          </select>
+          <input id="legalReasonInput" type="text" placeholder="Reason" required />
+          <button class="btn" type="submit">Create Hold</button>
+        </form>
+        <button id="complianceExportBtn" class="btn ghost" type="button">Export Compliance CSV</button>
+        <ul id="legalHoldList" class="list"></ul>
+      </article>
+    </section>
+
+    <script type="module" src="./ops-dashboard.js"></script>
+  </body>
+</html>
