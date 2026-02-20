@@ -1,86 +1,73 @@
-#!/usr/bin/env bash
-# Full GitHub Sync Script: Phase 1 -> Phase 8
-# Purpose: validate, stage, commit, tag, and optionally push release artifacts.
-
+#!/bin/bash
 set -euo pipefail
 
+# Full Sync Script: Phase 1-8
+# Usage:
+#   SKIP_PUSH=1 bash scripts/full-sync-phase1-8.sh   # dry-run
+
 BRANCH="${BRANCH:-full-sync}"
-TAG="${TAG:-v8.0-full}"
 REMOTE="${REMOTE:-origin}"
-SKIP_PUSH="${SKIP_PUSH:-0}"
-COMMIT_MSG="${COMMIT_MSG:-[phase8/full-implementation] FR-P8-1101..1120}"
+SKIP_PUSH="${SKIP_PUSH:-0}" # default = 0 -> push enabled
 
-echo "[INFO] Checking out branch ${BRANCH}..."
-git checkout -B "${BRANCH}"
+echo "=== Phase 1-8 Full Sync ==="
 
-echo "[INFO] Installing dependencies..."
-if [[ -f package-lock.json ]]; then
-  npm ci
-else
-  npm install
-fi
+echo "0. Ensure branch ${BRANCH}"
+git checkout "$BRANCH" >/dev/null 2>&1 || git checkout -b "$BRANCH"
 
-echo "[INFO] Building project..."
+echo "1. Install dependencies"
+npm ci
+
+echo "2. Build project"
 npm run build
 
-echo "[INFO] Running unit/integration tests..."
+echo "3. Run tests"
 npm test
-
-echo "[INFO] Running E2E tests..."
 npm run test:e2e
-
-echo "[INFO] Running performance tests..."
 npm run test:performance
-
-echo "[INFO] Running security tests..."
 npm run test:security
-
-echo "[INFO] Running chaos tests..."
 npm run test:chaos
 
-echo "[INFO] Running CI gate..."
+echo "4. Run CI gates"
 npm run ci:gate
 
-echo "[INFO] Running regression spot-check against Phase 1-7 critical suites..."
-npx vitest run test/phase1.api.test.ts test/phase7.modules.test.ts
+echo "5. Stage all updated files"
+git add .
 
-echo "[INFO] Staging source, tests, UI, and docs..."
-git add \
-  src \
-  test \
-  e2e \
-  web \
-  docs \
-  scripts \
-  supabase \
-  package.json \
-  package-lock.json \
-  tsconfig.json \
-  vitest.config.ts \
-  playwright.config.ts
+# Keep transient runtime folders out of automated commits when no .gitignore is present.
+git reset -q HEAD -- node_modules dist test-results 2>/dev/null || true
 
-if git diff --cached --quiet; then
-  echo "[INFO] No staged changes to commit."
+LAST_PHASE="$(git log -1 --pretty=%B | head -n 1)"
+COMMIT_MSG="[full-sync/auto] ${LAST_PHASE} - Verified all gates"
+
+git commit -m "$COMMIT_MSG" || echo "No changes to commit"
+
+# Auto-create next version tag from latest v*-full tag.
+LAST_TAG="$(git tag --list "v*-full" --sort=-creatordate | head -n 1)"
+if [[ -z "${LAST_TAG}" ]]; then
+  LAST_TAG="v0.0-full"
+fi
+TAG_VERSION="${LAST_TAG#v}"
+TAG_VERSION="${TAG_VERSION%-full}"
+MAJOR="${TAG_VERSION%%.*}"
+MINOR="${TAG_VERSION#*.}"
+if [[ -z "${MAJOR}" || -z "${MINOR}" || "${MAJOR}" == "${MINOR}" ]]; then
+  MAJOR="0"
+  MINOR="0"
+fi
+NEW_TAG="v${MAJOR}.$((MINOR + 1))-full"
+
+git tag -f "$NEW_TAG"
+echo "Created tag: $NEW_TAG"
+
+if [[ "$SKIP_PUSH" -eq 0 ]]; then
+  echo "All tests passed. Pushing to GitHub..."
+  git push "$REMOTE" "$BRANCH"
+  git push "$REMOTE" --tags
 else
-  echo "[INFO] Committing full sync..."
-  git commit -m "${COMMIT_MSG}"
+  echo "Push skipped (SKIP_PUSH=1)"
 fi
 
-if git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null; then
-  echo "[INFO] Replacing existing local tag ${TAG}..."
-  git tag -d "${TAG}"
-fi
-
-echo "[INFO] Tagging release ${TAG}..."
-git tag -a "${TAG}" -m "Full application release: Phase 1 -> Phase 8"
-
-if [[ "${SKIP_PUSH}" == "1" ]]; then
-  echo "[WARN] SKIP_PUSH=1 set; skipping branch/tag push."
-else
-  echo "[INFO] Pushing branch and tag to ${REMOTE}..."
-  git push -u "${REMOTE}" "${BRANCH}"
-  git push "${REMOTE}" "${TAG}"
-fi
-
-echo "[SUCCESS] Full Phase 1 -> 8 sync completed, tests passed, governance updated."
-echo "Branch: ${BRANCH}, Tag: ${TAG}"
+echo "=== Full Sync Complete ==="
+echo "Branch: $BRANCH"
+echo "Tag: $NEW_TAG"
+echo "SKIP_PUSH: $SKIP_PUSH"
