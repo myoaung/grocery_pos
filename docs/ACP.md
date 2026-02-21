@@ -822,4 +822,32 @@ Then:
 
 ---
 
+## 25. Phase 2 Foundation Acceptance (Schema / API / Mobile)
+
+### AC-P2-01
+Given: Phase 2 migration artifacts are present  
+When: migration gate executes in CI  
+Then:
+- core schema migration file is detected in `supabase/migrations/`
+- migration apply/list commands run with DB URL hidden in logs
+- Windows local drift checks are skipped without blocking local apply/list validation
+
+### AC-P2-02
+Given: backend Phase 2 scaffold is present  
+When: backend gates run  
+Then:
+- `npm run test:backend` passes
+- `npm run test:api` passes
+- route shell contracts for auth/products/orders/reporting return explicit JSON responses
+
+### AC-P2-03
+Given: mobile Phase 2 scaffold is present  
+When: widget tests run  
+Then:
+- `flutter test` passes
+- EN/MM localization assets load
+- mobile environment contract exposes client keys only and does not embed DB/service-role secrets
+
+---
+
 END OF DOCUMENT

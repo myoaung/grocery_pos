@@ -1,0 +1,24 @@
+{
+  "app": {
+    "title": "ကုန်စုံ POS"
+  },
+  "home": {
+    "title": "Phase 2 မိုဘိုင်း Scaffold",
+    "subtitle": "မိုဘိုင်း မော်ဂျူးများကို backend API ချိတ်ဆက်ရန် scaffold လုပ်ပြီးဖြစ်သည်။",
+    "env": "မိုဘိုင်း app တွင် SUPABASE_URL နှင့် SUPABASE_ANON_KEY သာသုံးပြီး database credential မထည့်ပါ။"
+  },
+  "modules": {
+    "auth": "ဝင်ရောက်ခွင့်",
+    "products": "ကုန်ပစ္စည်းများ",
+    "cart": "ဈေးဝယ်တောင်း",
+    "orders": "အော်ဒါများ"
+  },
+  "screens": {
+    "auth": "ဝင်ရောက်ခွင့် မော်ဂျူး scaffold",
+    "signup": "အကောင့်ဖွင့်ရန် scaffold",
+    "passwordReset": "စကားဝှက် ပြန်လည်သတ်မှတ် scaffold",
+    "productDetail": "ကုန်ပစ္စည်း အသေးစိတ် scaffold",
+    "checkout": "Checkout scaffold",
+    "orderHistory": "အော်ဒါမှတ်တမ်း scaffold"
+  }
+}

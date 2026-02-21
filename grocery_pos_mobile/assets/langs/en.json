@@ -1,0 +1,24 @@
+{
+  "app": {
+    "title": "Grocery POS"
+  },
+  "home": {
+    "title": "Phase 2 Mobile Scaffold",
+    "subtitle": "Core mobile modules are scaffolded for backend API integration.",
+    "env": "Client app uses SUPABASE_URL and SUPABASE_ANON_KEY only; database credentials remain backend-only."
+  },
+  "modules": {
+    "auth": "Authentication",
+    "products": "Products",
+    "cart": "Cart",
+    "orders": "Orders"
+  },
+  "screens": {
+    "auth": "Authentication module scaffold",
+    "signup": "Sign up scaffold",
+    "passwordReset": "Password reset scaffold",
+    "productDetail": "Product detail scaffold",
+    "checkout": "Checkout scaffold",
+    "orderHistory": "Order history scaffold"
+  }
+}

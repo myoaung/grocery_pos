@@ -2,6 +2,57 @@
 
 ---
 
+## v1.16 (Phase 2 Foundation Scaffold - In Progress)
+Date: 2026-02-21  
+Author: Application Owner
+
+Reason:
+- Stand up Phase 2 schema, backend, and mobile foundations with gated CI automation.
+
+Changes:
+- Added Supabase Phase 2 schema and seed artifacts:
+  - `supabase/migrations/20260221120107_20260221_phase2_core_schema.sql`
+  - `supabase/seed_phase2.sql`
+  - `supabase/config.toml` seed list updated to include `seed_phase2.sql`
+- Added backend API scaffold and tests:
+  - `backend/src/*` (auth/products/orders/reporting route shells)
+  - `backend/tests/backend.module.test.ts`
+  - `backend/tests/api/health.test.ts`
+  - `backend/jest.config.cjs`
+  - `backend/tsconfig.json`
+- Added Flutter Phase 2 mobile scaffold:
+  - `grocery_pos_mobile/` project baseline
+  - localization assets (`en.json`, `my.json`)
+  - module shell routes for auth/products/cart/orders
+  - `lib/common/env.dart` client-only Supabase env contract
+- Expanded CI gate to include backend and mobile validation:
+  - `.github/workflows/full-sync-main-gate.yml` now runs `test:backend`, `test:api`, and `flutter test`
+- Hardened Supabase migration gate for Windows local developer flow:
+  - `scripts/supabase-migration-gate.ts` now avoids Docker hard-fail for local apply/list paths and keeps schema drift skip behavior on Windows local.
+- Governance updates:
+  - `docs/FRD-v1.3.md` (Phase 2 addendum)
+  - `docs/phase_summary.md`
+  - `docs/TC_traceability_matrix.md`
+
+Verification:
+- `npm run lint` passed.
+- `npm run build` passed.
+- `npm test` passed.
+- `npm run test:e2e` passed.
+- `npm run test:security` passed.
+- `npm run test:chaos` passed.
+- `npm run test:performance` passed.
+- `npm run ci:gate` passed.
+- `npm run test:backend` passed.
+- `npm run test:api` passed.
+- `flutter test` (in `grocery_pos_mobile`) passed.
+- `npm run supabase:ci` blocked by remote DB auth failure (`FATAL: Tenant or user not found`) with placeholder/non-rotated credentials.
+
+Approval:
+- Status: Draft for owner review; Supabase credential validation pending before merge.
+
+---
+
 ## v1.15 (Phase 8 Actionable Intelligence - PASS / LOCKED)
 Date: 2026-02-20  
 Author: Application Owner

@@ -1,13 +1,13 @@
 # Cosmic Forge Grocery POS
-## TC Traceability Matrix v1.13 (Authoritative)
+## TC Traceability Matrix v1.14 (Authoritative)
 
-Version: v1.13  
+Version: v1.14  
 Status: Active  
 Date: 2026-02-21  
 Owner: Application Owner  
 Supersedes: `docs/TC_traceability_matrix_v1.1.md`  
 Top Authority: `docs/CFGP-MES-v1.0.md`  
-References: `docs/CFGP-MES-v1.0.md`, `docs/Release-Gatekeeper.md`, `docs/release_governance.md`, `docs/ACP.md`, `docs/FRD-v1.2.md`, `docs/report_catalog.md`, `docs/change_log.md`
+References: `docs/CFGP-MES-v1.0.md`, `docs/Release-Gatekeeper.md`, `docs/release_governance.md`, `docs/ACP.md`, `docs/FRD-v1.3.md`, `docs/report_catalog.md`, `docs/change_log.md`
 
 ---
 
@@ -49,6 +49,8 @@ Initial baseline tags:
 - `DV-2026-0008`
 - `RV-2026.02.21.1`
 - `DV-2026-0009`
+- `RV-2026.02.21.2`
+- `DV-2026-0010`
 
 Update rules:
 1. If requirement interpretation changes, bump `RV-*`.
@@ -350,6 +352,14 @@ Status values:
 | TC-AC-DB-01-OPS-001 | AC-DB-01 | G-DB | P0 | OPS | `full-sync -> main` gate fails when `SUPABASE_URL` or `SUPABASE_SERVICE_ROLE_KEY` is missing | `[OPS][CI] .github/workflows/full-sync-main-gate.yml`, `scripts/supabase-env-guard.ts` | RV-2026.02.21.1 | DV-2026-0009 | 2026-02-21 | PASS |
 | TC-AC-DB-01-OPS-002 | AC-DB-01 | G-DB | P0 | OPS | Supabase migrations must apply successfully before merge gate passes | `[OPS][DB] .github/workflows/full-sync-main-gate.yml`, `scripts/supabase-migration-gate.ts`, `supabase/migrations/` | RV-2026.02.21.1 | DV-2026-0009 | 2026-02-21 | PASS |
 | TC-AC-DB-01-OPS-003 | AC-DB-01 | G-DB | P0 | OPS | Migration drift check fails when history/schema drift is detected | `[OPS][DB] scripts/supabase-migration-gate.ts` (`supabase migration list`, `supabase db diff`) | RV-2026.02.21.1 | DV-2026-0009 | 2026-02-21 | PASS |
+
+### 3.12 Phase 2 Foundation Traceability (Schema/API/Mobile)
+
+| TC ID | Req ID | Phase | Priority | Level | Scenario | Evidence Ref | RV Tag | DV Tag | Last Updated | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| TC-P2-DB-001 | FRD-v1.3-DB | P2-F | P0 | OPS | Core schema migration applies with tenant/branch-scoped RLS policies (pending valid rotated Supabase DB credentials for remote apply) | `supabase/migrations/20260221120107_20260221_phase2_core_schema.sql`, `scripts/supabase-migration-gate.ts` | RV-2026.02.21.2 | DV-2026-0010 | 2026-02-21 | BLOCKED |
+| TC-P2-API-001 | FRD-v1.3-API | P2-F | P1 | IT | Backend scaffold health/auth/products/orders/reporting routes compile and execute basic API contracts | `backend/tests/backend.module.test.ts`, `backend/tests/api/health.test.ts` | RV-2026.02.21.2 | DV-2026-0010 | 2026-02-21 | PASS |
+| TC-P2-MOB-001 | FRD-v1.3-MOBILE | P2-F | P1 | E2E | Flutter mobile shell loads module routes with EN/MM localization baseline and no DB/service-role secrets in client env contract | `grocery_pos_mobile/test/widget_test.dart`, `grocery_pos_mobile/lib/common/env.dart`, `.github/workflows/full-sync-main-gate.yml` | RV-2026.02.21.2 | DV-2026-0010 | 2026-02-21 | PASS |
 
 ---
 

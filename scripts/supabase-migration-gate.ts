@@ -7,6 +7,7 @@ const SUPABASE_POSTGRES_IMAGE = "public.ecr.aws/supabase/postgres:17.6.1.063";
 type GateMode = "ci" | "apply" | "drift";
 
 function resolveMode(): GateMode {
+  if (process.argv.includes("--ci")) return "ci";
   if (process.argv.includes("--apply")) return "apply";
   if (process.argv.includes("--drift")) return "drift";
   return "ci";
@@ -76,18 +77,11 @@ function buildDbUrlWithPassword(): string {
   return parsed.toString();
 }
 
-function ensureDockerForWindowsLocal(): void {
-  if (process.platform !== "win32" || process.env.CI) {
-    return;
-  }
-
-  if (!process.env.SHADOW_DB_PORT) {
+function configureWindowsLocalShadowPort(): void {
+  if (process.platform === "win32" && !process.env.CI && !process.env.SHADOW_DB_PORT) {
     process.env.SHADOW_DB_PORT = "0";
+    process.stdout.write("Windows local mode: SHADOW_DB_PORT=0 to avoid shadow DB port conflicts.\n");
   }
-  process.stdout.write("Windows local mode: SHADOW_DB_PORT=0 to avoid shadow DB port conflicts.\n");
-
-  runCommand("docker info", "Docker Desktop preflight");
-  runCommand(`docker pull ${SUPABASE_POSTGRES_IMAGE}`, "Supabase shadow DB image pull");
 }
 
 function applyMigrations(dbUrlWithPassword: string): void {
@@ -148,7 +142,7 @@ function main() {
     const mode = resolveMode();
     assertSupabaseEnv();
     assertCliAvailable();
-    ensureDockerForWindowsLocal();
+    configureWindowsLocalShadowPort();
 
     const dbUrlWithPassword = buildDbUrlWithPassword();
 
