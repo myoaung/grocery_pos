@@ -1,9 +1,9 @@
 # Cosmic Forge Grocery POS
-## TC Traceability Matrix v1.12 (Authoritative)
+## TC Traceability Matrix v1.13 (Authoritative)
 
-Version: v1.12  
+Version: v1.13  
 Status: Active  
-Date: 2026-02-20  
+Date: 2026-02-21  
 Owner: Application Owner  
 Supersedes: `docs/TC_traceability_matrix_v1.1.md`  
 Top Authority: `docs/CFGP-MES-v1.0.md`  
@@ -47,6 +47,8 @@ Initial baseline tags:
 - `DV-2026-0007`
 - `RV-2026.02.20.8`
 - `DV-2026-0008`
+- `RV-2026.02.21.1`
+- `DV-2026-0009`
 
 Update rules:
 1. If requirement interpretation changes, bump `RV-*`.
@@ -340,6 +342,14 @@ Status values:
 | TC-FR-1118-SEC | FR-P8-1118 | 8 | P1 | SEC | Ops enhancement feature flag defaults OFF and fails closed | `[SEC] test/phase8.security.test.ts` (`feature-flag fail-closed behavior`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
 | TC-FR-1119-SEC | FR-P8-1119 | 8 | P0 | SEC | Phase 8 routes reject cross-tenant access attempts with 403 | `[INT][SEC] test/phase8.modules.test.ts`, `test/phase8.security.test.ts` | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
 | TC-FR-1120-LOAD | FR-P8-1120 | 8 | P0 | PERF | Phase 8 release gate passes with no Phase 1-7 regression and budget compliance | `[LOAD][SEC] test/phase8.performance.test.ts`, `scripts/ci-gate.ts`, `npm run ci:gate` | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+
+### 3.11 DB Provisioning & Migration Gate Traceability (AC-DB-01)
+
+| TC ID | Req ID | Phase | Priority | Level | Scenario | Evidence Ref | RV Tag | DV Tag | Last Updated | Status |
+|---|---|---|---|---|---|---|---|---|---|---|
+| TC-AC-DB-01-OPS-001 | AC-DB-01 | G-DB | P0 | OPS | `full-sync -> main` gate fails when `SUPABASE_URL` or `SUPABASE_SERVICE_ROLE_KEY` is missing | `[OPS][CI] .github/workflows/full-sync-main-gate.yml`, `scripts/supabase-env-guard.ts` | RV-2026.02.21.1 | DV-2026-0009 | 2026-02-21 | PASS |
+| TC-AC-DB-01-OPS-002 | AC-DB-01 | G-DB | P0 | OPS | Supabase migrations must apply successfully before merge gate passes | `[OPS][DB] .github/workflows/full-sync-main-gate.yml`, `scripts/supabase-migration-gate.ts`, `supabase/migrations/` | RV-2026.02.21.1 | DV-2026-0009 | 2026-02-21 | PASS |
+| TC-AC-DB-01-OPS-003 | AC-DB-01 | G-DB | P0 | OPS | Migration drift check fails when history/schema drift is detected | `[OPS][DB] scripts/supabase-migration-gate.ts` (`supabase migration list`, `supabase db diff`) | RV-2026.02.21.1 | DV-2026-0009 | 2026-02-21 | PASS |
 
 ---
 

@@ -729,7 +729,7 @@ Scope guardrails:
 | FR ID | Priority | Requirement | Acceptance Summary |
 |---|---|---|---|
 | FR-P8-1119 | P0 | Phase 8 routes must enforce tenant/branch isolation and RBAC. | Cross-tenant access attempts are rejected (`403`) across predictive/compliance/webhook/intelligence routes. |
-| FR-P8-1120 | P0 | Phase 8 rollout must preserve prior phase behavior and pass gate checks. | Build/test/e2e/perf/security/chaos/ci gate pass with no regressions in Phases 1-7 runtime behavior. |
+| FR-P8-1120 | P0 | Phase 8 rollout must preserve prior phase behavior and pass gate checks. | Build/test/e2e/perf/security/chaos/ci gate pass, plus enforced DB Provisioning & Migration gate (Supabase env contract, migration apply, drift check) for `full-sync -> main` with no regressions in Phases 1-7 runtime behavior. |
 
 ## 14. Phase 8 References
 
@@ -763,6 +763,10 @@ Scope guardrails:
   - `e2e/phase8.extensions.spec.ts`
 - Release and traceability:
   - `scripts/full-sync-phase1-8.sh`
+  - `.github/workflows/full-sync-main-gate.yml`
+  - `scripts/supabase-env-guard.ts`
+  - `scripts/supabase-migration-gate.ts`
+  - `supabase/migrations/`
   - `docs/TC_traceability_matrix.md` (Phase 8 section)
   - `docs/change_log.md` (v1.15)
 

@@ -808,4 +808,18 @@ Then:
 
 ---
 
+## 24. DB Provisioning & Migration Gate (Enforced)
+
+### AC-DB-01
+Given: a pull request targets `main` from `full-sync`  
+When: merge gate workflow runs  
+Then:
+- `npm run build`, `npm test`, `npm run test:e2e`, `npm run test:security`, `npm run test:chaos`, `npm run test:performance`, and `npm run ci:gate` all pass
+- CI fails if `SUPABASE_URL` is missing
+- CI fails if `SUPABASE_SERVICE_ROLE_KEY` is missing
+- Supabase migrations apply successfully
+- migration drift checks return no drift (history and schema)
+
+---
+
 END OF DOCUMENT

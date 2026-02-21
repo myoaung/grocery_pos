@@ -14,7 +14,11 @@
     "test:performance": "vitest run test/phase6.performance.test.ts test/phase7.performance.test.ts test/phase8.performance.test.ts",
     "test:chaos": "vitest run test/phase6.chaos.test.ts test/phase7.chaos.test.ts test/phase8.chaos.test.ts",
     "test:soak": "vitest run test/phase6_1.operational.test.ts -t \"10h simulated soak load\"",
-    "ci:gate": "tsx scripts/ci-gate.ts"
+    "ci:gate": "tsx scripts/ci-gate.ts",
+    "supabase:env:guard": "tsx scripts/supabase-env-guard.ts",
+    "supabase:migrations:apply": "tsx scripts/supabase-migration-gate.ts --apply",
+    "supabase:migrations:drift": "tsx scripts/supabase-migration-gate.ts --drift",
+    "supabase:ci": "tsx scripts/supabase-migration-gate.ts"
   },
   "dependencies": {
     "express": "^4.21.2",

@@ -758,7 +758,7 @@ Changes:
   - `src/routes/api.ts`
   - `src/utils/context.ts`, `src/utils/errors.ts`, `src/utils/export.ts`, `src/utils/keys.ts`
 - Added Supabase migration artifact:
-  - `supabase/migrations/20260220_phase1_tenant_rbac_offline.sql`
+  - `supabase/migrations/20260220001000_phase1_tenant_rbac_offline.sql`
 - Added integration tests:
   - `test/phase1.api.test.ts`
 - Extended governance enforcement in runtime:
