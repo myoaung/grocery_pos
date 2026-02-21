@@ -9,7 +9,43 @@ permissions:
   contents: read
 
 jobs:
+  supabase-production-migration:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Set up Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Load .env placeholders
+        run: cp .env.example .env
+
+      - name: Guard Supabase environment contract
+        run: npm run supabase:env:guard
+
+      - name: Apply production migrations and verify drift
+        run: npm run supabase:ci
+
   deploy-staging:
+    needs: supabase-production-migration
     runs-on: ubuntu-latest
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
@@ -39,7 +75,25 @@ jobs:
         run: npx vercel build --token="$VERCEL_TOKEN"
 
       - name: Deploy to Vercel staging
-        run: npx vercel deploy --prebuilt --token="$VERCEL_TOKEN"
+        id: deploy_staging
+        shell: bash
+        run: |
+          STAGING_URL="$(npx vercel deploy --prebuilt --token="$VERCEL_TOKEN" | tail -n 1)"
+          if [[ "$STAGING_URL" != http* ]]; then
+            STAGING_URL="https://$STAGING_URL"
+          fi
+          echo "staging_url=$STAGING_URL" >> "$GITHUB_OUTPUT"
+          echo "Staging URL: $STAGING_URL"
+
+      - name: Staging smoke test
+        shell: bash
+        run: |
+          STATUS_CODE="$(curl -sS -o /dev/null -w "%{http_code}" "${{ steps.deploy_staging.outputs.staging_url }}")"
+          echo "Staging smoke status code: $STATUS_CODE"
+          if [[ "$STATUS_CODE" == "000" || "$STATUS_CODE" -ge 500 ]]; then
+            echo "Staging smoke test failed."
+            exit 1
+          fi
 
   deploy-production:
     needs: deploy-staging
@@ -73,3 +127,24 @@ jobs:
 
       - name: Deploy to Vercel production
         run: npx vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+
+  notify-release:
+    if: always()
+    needs:
+      - supabase-production-migration
+      - deploy-staging
+      - deploy-production
+    runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - name: Slack notification (optional)
+        if: env.SLACK_WEBHOOK_URL != ''
+        shell: bash
+        run: |
+          RESULT="success"
+          if [[ "${{ needs.supabase-production-migration.result }}" != "success" || "${{ needs.deploy-staging.result }}" != "success" || "${{ needs.deploy-production.result }}" != "success" ]]; then
+            RESULT="failure"
+          fi
+          PAYLOAD=$(printf '{"text":"Release pipeline %s for %s@%s (run: %s)"}' "$RESULT" "${{ github.repository }}" "${{ github.sha }}" "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
+          curl -sS -X POST -H 'Content-type: application/json' --data "$PAYLOAD" "$SLACK_WEBHOOK_URL"
