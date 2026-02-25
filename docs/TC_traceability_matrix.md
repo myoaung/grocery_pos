@@ -105,7 +105,7 @@ Status values:
 | TC-NFR-002-OPS-001 | NFR-002 | 3 | P0 | OPS | Operate offline for 72 hours without data loss | TBD | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PLANNED |
 | TC-NFR-003-PERF-001 | NFR-003 | 3 | P1 | PERF | Sync start and queue-drain targets after reconnect | TBD | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PLANNED |
 | TC-NFR-004-OPS-001 | NFR-004 | 7 | P1 | OPS | Monthly availability target measurement | TBD | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PLANNED |
-| TC-NFR-005-SEC-001 | NFR-005 | 7 | P0 | SEC | Verify TLS, encryption at rest, and privileged auth | TBD | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PLANNED |
+| TC-NFR-005-SEC-001 | NFR-005 | 7 | P0 | SEC | Verify TLS, encryption at rest, and privileged auth | `docs/risk_register.md` (TLS MITIGATED via Supabase + HTTPS; at-rest ACCEPTED as platform-managed, approver/date recorded) | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-25 | PASS |
 | TC-NFR-006-OPS-001 | NFR-006 | 7 | P0 | OPS | Validate RPO/RTO compliance via drill evidence | TBD | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PLANNED |
 | TC-NFR-007-UAT-001 | NFR-007 | 5 | P1 | UAT | Confirm MM/EN localization and locale formats | TBD | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PLANNED |
 

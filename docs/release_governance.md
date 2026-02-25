@@ -39,6 +39,9 @@ Required metadata:
 - environment target
 - build timestamp (UTC)
 
+Release documentation:
+- License certificate template: `docs/LICENSE_CERTIFICATE_TEMPLATE.md` (post-launch issuance)
+
 Retention policy:
 1. Keep last 30 production artifacts.
 2. Keep all artifacts associated with incident windows until incident closure.
