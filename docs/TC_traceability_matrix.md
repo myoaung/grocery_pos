@@ -357,7 +357,7 @@ Status values:
 
 | TC ID | Req ID | Phase | Priority | Level | Scenario | Evidence Ref | RV Tag | DV Tag | Last Updated | Status |
 |---|---|---|---|---|---|---|---|---|---|---|
-| TC-P2-DB-001 | FRD-v1.3-DB | P2-F | P0 | OPS | Core schema migration applies with tenant/branch-scoped RLS policies | `supabase/migrations/20260221120107_20260221_phase2_core_schema.sql`, `scripts/supabase-migration-gate.ts`, `npm run supabase:ci` (2026-02-25: migrations up-to-date, migration list matched, gate passed) | RV-2026.02.21.2 | DV-2026-0010 | 2026-02-25 | PASS |
+| TC-P2-DB-001 | FRD-v1.3-DB | P2-F | P0 | OPS | Core schema migration applies with tenant/branch-scoped RLS policies | `supabase/migrations/20260221120107_20260221_phase2_core_schema.sql`, `scripts/supabase-migration-gate.ts`, `npm run supabase:ci` (2026-02-25: migrations up-to-date, migration list matched, gate passed; `pgbouncer=true` override), `psql` read/write staging check (2026-02-25 11:06:51 UTC; temp write ok) | RV-2026.02.21.2 | DV-2026-0010 | 2026-02-25 | PASS |
 | TC-P2-API-001 | FRD-v1.3-API | P2-F | P1 | IT | Backend scaffold health/auth/products/orders/reporting routes compile and execute basic API contracts | `backend/tests/backend.module.test.ts`, `backend/tests/api/health.test.ts` | RV-2026.02.21.2 | DV-2026-0010 | 2026-02-21 | PASS |
 | TC-P2-MOB-001 | FRD-v1.3-MOBILE | P2-F | P1 | E2E | Flutter mobile shell loads module routes with EN/MM localization baseline and no DB/service-role secrets in client env contract | `grocery_pos_mobile/test/widget_test.dart`, `grocery_pos_mobile/lib/common/env.dart`, `.github/workflows/full-sync-main-gate.yml` | RV-2026.02.21.2 | DV-2026-0010 | 2026-02-21 | PASS |
 
