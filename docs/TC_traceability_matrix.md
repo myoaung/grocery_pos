@@ -84,7 +84,7 @@ Status values:
 | TC-FR-300-E2E-001 | FR-300 | 3 | P0 | E2E | Complete retail and wholesale checkout flow | TBD | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PLANNED |
 | TC-FR-301-INT-001 | FR-301 | 3 | P0 | IT | Apply deterministic discount precedence rules | TBD | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PLANNED |
 | TC-FR-302-UT-001 | FR-302 | 3 | P0 | UT | Resolve tax rule by effective date and tax category | TBD | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PLANNED |
-| TC-FR-303-E2E-001 | FR-303 | 3 | P0 | E2E | Queue offline sale/inventory event and persist locally | `test/phase1.api.test.ts` (`supports offline queue, conflict visibility, and read-only fallback`) | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PASS |
+| TC-FR-303-E2E-001 | FR-303 | 3 | P0 | E2E | Queue offline sale/inventory event and persist locally | `npm run test -- test/phase1.api.test.ts -t "supports offline queue, conflict visibility, and read-only fallback"` (2026-02-26: 1 passed; offline checkout queued and sync retry path validated) | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PASS |
 | TC-FR-304-INT-001 | FR-304 | 3 | P0 | IT | Idempotent replay rejects duplicate UUIDs with explicit 409 and preserves stock integrity | `test/phase1.api.test.ts` (`rejects duplicate idempotency replay, preserves stock integrity, and remains tenant-isolated`) | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PASS |
 | TC-FR-305-E2E-001 | FR-305 | 3 | P1 | E2E | Generate receipt with config-driven brand asset | TBD | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PLANNED |
 | TC-FR-400-INT-001 | FR-400 | 4 | P1 | IT | Search customer by name/phone and view history | TBD | RV-2026.02.20.1 | DV-2026-0001 | 2026-02-20 | PLANNED |
@@ -173,7 +173,7 @@ Status values:
 | TC-FR-801-LR-001 | FR-P4-801 | 4 | P1 | IT | Loyalty points accrual per transaction | `test/phase4.modules.test.ts` | RV-2026.02.20.4 | DV-2026-0004 | 2026-02-20 | PASS |
 | TC-FR-802-LR-002 | FR-P4-802 | 4 | P1 | IT | Redeemable rewards calculation and ledger update | `test/phase4.modules.test.ts` | RV-2026.02.20.4 | DV-2026-0004 | 2026-02-20 | PASS |
 | TC-FR-803-LR-003 | FR-P4-803 | 4 | P1 | IT | Loyalty tier recalculation after qualifying purchases | `test/phase4.modules.test.ts` | RV-2026.02.20.4 | DV-2026-0004 | 2026-02-20 | PASS |
-| TC-FR-804-OFF-001 | FR-P4-804 | 4 | P1 | IT | Offline queue sync for sales and inventory events | `test/phase4.modules.test.ts` | RV-2026.02.20.4 | DV-2026-0004 | 2026-02-20 | PASS |
+| TC-FR-804-OFF-001 | FR-P4-804 | 4 | P1 | IT | Offline queue sync for sales and inventory events | `npm run test -- test/phase4.modules.test.ts` (2026-02-26: 5 passed, local offline queue/reconcile paths green) + staging probe to `https://grocerypos-seven.vercel.app` returned `404 NOT_FOUND` for `/healthz` and `/api/v1/tenants/tenant-a/sync/queue` | RV-2026.02.20.4 | DV-2026-0004 | 2026-02-20 | FAIL |
 | TC-FR-805-OFF-002 | FR-P4-805 | 4 | P1 | IT | Offline conflict detection triggers alerts and prevents double-post | `test/phase4.modules.test.ts` | RV-2026.02.20.4 | DV-2026-0004 | 2026-02-20 | PASS |
 | TC-FR-806-OFF-003 | FR-P4-806 | 4 | P2 | IT | Offline sync respects branch/tenant isolation | `test/phase4.modules.test.ts` | RV-2026.02.20.4 | DV-2026-0004 | 2026-02-20 | PASS |
 | TC-FR-807-REP-001 | FR-P4-807 | 4 | P1 | IT | Reporting extensions expose additional metrics and filters | `test/phase4.modules.test.ts` | RV-2026.02.20.4 | DV-2026-0004 | 2026-02-20 | PASS |
@@ -343,7 +343,7 @@ Status values:
 | TC-FR-1117-SEC | FR-P8-1117 | 8 | P1 | SEC | Predictive action feature flag defaults OFF and fails closed | `[SEC] test/phase8.security.test.ts` (`feature-flag fail-closed behavior`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
 | TC-FR-1118-SEC | FR-P8-1118 | 8 | P1 | SEC | Ops enhancement feature flag defaults OFF and fails closed | `[SEC] test/phase8.security.test.ts` (`feature-flag fail-closed behavior`) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
 | TC-FR-1119-SEC | FR-P8-1119 | 8 | P0 | SEC | Phase 8 routes reject cross-tenant access attempts with 403 | `[INT][SEC] test/phase8.modules.test.ts`, `test/phase8.security.test.ts` | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
-| TC-FR-1120-LOAD | FR-P8-1120 | 8 | P0 | PERF | Phase 8 release gate passes with no Phase 1-7 regression and budget compliance | `[LOAD][SEC] test/phase8.performance.test.ts`, `scripts/ci-gate.ts`, `npm run ci:gate` | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | PASS |
+| TC-FR-1120-LOAD | FR-P8-1120 | 8 | P0 | PERF | Phase 8 release gate passes with no Phase 1-7 regression and budget compliance | `npm run ci:gate` PASS (2026-02-26), `npm run lint` PASS, `npm run sprint4:gate` PASS, `npm run rrr:go:gate` PASS; `npm run build` FAIL (`next` not installed), `npm run supabase:ci` FAIL (migration drift check error: prepared statement `lrupsc_1_0` already exists) | RV-2026.02.20.8 | DV-2026-0008 | 2026-02-20 | FAIL |
 
 ### 3.11 DB Provisioning & Migration Gate Traceability (AC-DB-01)
 
