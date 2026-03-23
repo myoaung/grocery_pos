@@ -8,7 +8,7 @@ const REQUIRED_ENV_KEYS = [
   "SUPABASE_DB_PASSWORD",
 ] as const;
 
-function parseDotEnv(content: string): Record<string, string> {
+export function parseDotEnv(content: string): Record<string, string> {
   const parsed: Record<string, string> = {};
   for (const rawLine of content.split(/\r?\n/)) {
     const line = rawLine.trim();
@@ -37,6 +37,7 @@ function parseDotEnv(content: string): Record<string, string> {
 
 export function loadEnvFiles(): void {
   const files = [".env", ".env.local"];
+  const fileAssigned = new Set<string>();
   for (const file of files) {
     const absolutePath = path.resolve(process.cwd(), file);
     if (!existsSync(absolutePath)) {
@@ -44,14 +45,18 @@ export function loadEnvFiles(): void {
     }
     const parsed = parseDotEnv(readFileSync(absolutePath, "utf8"));
     for (const [key, value] of Object.entries(parsed)) {
-      if (process.env[key] === undefined || process.env[key] === "") {
-        process.env[key] = value;
+      // Environment variables provided by the shell/CI should win over file values.
+      // Later env files can still override earlier env files for keys we loaded ourselves.
+      if (!fileAssigned.has(key) && process.env[key] !== undefined) {
+        continue;
       }
+      process.env[key] = value;
+      fileAssigned.add(key);
     }
   }
 }
 
-function isPlaceholder(value: string): boolean {
+export function isPlaceholder(value: string): boolean {
   const normalized = value.trim().toLowerCase();
   return (
     normalized.length === 0 ||
@@ -63,7 +68,7 @@ function isPlaceholder(value: string): boolean {
   );
 }
 
-function isValidHttpUrl(value: string): boolean {
+export function isValidHttpUrl(value: string): boolean {
   try {
     const parsed = new URL(value);
     return parsed.protocol === "https:" || parsed.protocol === "http:";
@@ -72,7 +77,7 @@ function isValidHttpUrl(value: string): boolean {
   }
 }
 
-function isValidPgUrlWithoutPassword(value: string): boolean {
+export function isValidPgUrlWithoutPassword(value: string): boolean {
   try {
     const parsed = new URL(value);
     if (!(parsed.protocol === "postgres:" || parsed.protocol === "postgresql:")) {

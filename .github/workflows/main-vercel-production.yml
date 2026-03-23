@@ -9,7 +9,40 @@ permissions:
   contents: read
 
 jobs:
+  release-preflight-gates:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
+      JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+      JWKS_URI: ${{ secrets.JWKS_URI }}
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Load .env placeholders
+        run: cp .env.example .env
+
+      - name: Guard runtime environment contract
+        run: npm run runtime:env:guard
+
+      - name: Build project
+        run: npm run build
+
   supabase-production-migration:
+    needs: release-preflight-gates
     runs-on: ubuntu-latest
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
@@ -48,6 +81,12 @@ jobs:
     needs: supabase-production-migration
     runs-on: ubuntu-latest
     env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
+      JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+      JWKS_URI: ${{ secrets.JWKS_URI }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -64,6 +103,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Guard runtime environment contract
+        run: npm run runtime:env:guard
 
       - name: Build project
         run: npm run build
@@ -99,6 +141,12 @@ jobs:
     needs: deploy-staging
     runs-on: ubuntu-latest
     env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
+      JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+      JWKS_URI: ${{ secrets.JWKS_URI }}
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
@@ -116,6 +164,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Guard runtime environment contract
+        run: npm run runtime:env:guard
+
       - name: Build project
         run: npm run build
 
@@ -131,6 +182,7 @@ jobs:
   notify-release:
     if: always()
     needs:
+      - release-preflight-gates
       - supabase-production-migration
       - deploy-staging
       - deploy-production
@@ -143,7 +195,7 @@ jobs:
         shell: bash
         run: |
           RESULT="success"
-          if [[ "${{ needs.supabase-production-migration.result }}" != "success" || "${{ needs.deploy-staging.result }}" != "success" || "${{ needs.deploy-production.result }}" != "success" ]]; then
+          if [[ "${{ needs.release-preflight-gates.result }}" != "success" || "${{ needs.supabase-production-migration.result }}" != "success" || "${{ needs.deploy-staging.result }}" != "success" || "${{ needs.deploy-production.result }}" != "success" ]]; then
             RESULT="failure"
           fi
           PAYLOAD=$(printf '{"text":"Release pipeline %s for %s@%s (run: %s)"}' "$RESULT" "${{ github.repository }}" "${{ github.sha }}" "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")

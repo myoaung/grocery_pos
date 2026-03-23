@@ -38,7 +38,11 @@ jobs:
 
     env:
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      JWT_ISSUER: ${{ secrets.JWT_ISSUER }}
+      JWT_AUDIENCE: ${{ secrets.JWT_AUDIENCE }}
+      JWKS_URI: ${{ secrets.JWKS_URI }}
       SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
       SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
 
@@ -76,6 +80,9 @@ jobs:
 
       - name: Guard Supabase environment contract
         run: npm run supabase:env:guard
+
+      - name: Guard runtime environment contract
+        run: npm run runtime:env:guard
 
       - name: Build and required test suites
         run: |
